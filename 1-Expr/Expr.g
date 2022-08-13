@@ -6,6 +6,7 @@ expr: expr PLUS expr
     | NUM
     ;
 
+// i tokens sono espressi come espressioni regolari
 NUM: [0-9]+;
 PLUS: '+';
-WS: [ \n] -> skip;
+WS: [ \n\t\r] -> skip;
