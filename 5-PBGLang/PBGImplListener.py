@@ -1,5 +1,3 @@
-# Generated from PBGLang.g4 by ANTLR 4.10.1
-from antlr4 import *
 from PBGLangParser import PBGLangParser
 from PBGLangListener import PBGLangListener
 
@@ -7,7 +5,8 @@ from PBGLangListener import PBGLangListener
 class PBGImplListener(PBGLangListener):
 
     def __init__(self):
-        # Creo il dizionario con le variabili
+        # Creo il dizionario dove inserisco le variabili definite 
+        # dallo script da interpretare
         self.var_dict = dict()
         super(PBGLangListener, self).__init__()
 
