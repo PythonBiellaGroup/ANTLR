@@ -1,2 +1,0 @@
-mario SHOUTS: hello @andrea /pink/this will work/ :-)
-andrea says: hello @mario /red/do not shout/ :-) and look at [this awesome website](https://pythonbiellagroup.it)
