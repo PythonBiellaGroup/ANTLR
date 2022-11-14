@@ -5,6 +5,7 @@ from antlr4 import CommonTokenStream, InputStream
 from entity_parser.AntlrEntityLexer import AntlrEntityLexer
 from entity_parser.AntlrEntityParser import AntlrEntityParser
 
+
 class ParserTest(unittest.TestCase):
     def test_parse_module(self):
         code = '''module Insurance {
