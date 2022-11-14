@@ -29,4 +29,7 @@ class ParserTest(unittest.TestCase):
         parser = AntlrEntityParser(token_stream)
         tree = parser.module()
         self.assertIsInstance(tree, AntlrEntityParser.ModuleContext)
+        self.assertIsInstance(tree.getChild(4), AntlrEntityParser.EntityContext)
+        self.assertEqual(2, len(tree.entities))
+        self.assertIsInstance(tree.entities[0], AntlrEntityParser.EntityContext)
         self.assertEqual(0, parser.getNumberOfSyntaxErrors())

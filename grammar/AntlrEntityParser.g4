@@ -10,6 +10,7 @@ module:
     MODULE name=ID LCRLY  // Match di 3 token: MODULE, ID e LCRLY
         entities+=entity* // Match di 0 o più sottoregole entity
     RCRLY                 // Match di 1 token RCRLY
+    EOF
     ;
 
 entity:
