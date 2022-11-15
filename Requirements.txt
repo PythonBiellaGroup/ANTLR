@@ -1,1 +1,7 @@
 antlr4-python3-runtime==4.11.1
+future-fstrings==1.2.0
+lxml==4.9.1
+ordered-set==4.1.0
+pyecore==0.13.0
+pylasu==0.3.0
+RestrictedPython==6.0
