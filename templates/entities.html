@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1>Instances of {{entity.name}}</h1>
+        {% if instances|length == 0 %}
+            <i>No instances</i>
+        {% else %}
+        {% endif %}
+        <br/>
+        <button class="add-button">Add {{entity.name}}</button>
+    </div>
+{% endblock %}

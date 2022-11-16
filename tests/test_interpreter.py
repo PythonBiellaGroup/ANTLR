@@ -3,7 +3,7 @@ import unittest
 from antlr4 import CommonTokenStream, InputStream
 from pylasu.StrumentaLanguageSupport import ReferenceByName
 
-from interpreter.ast import Module, Entity, Feature, StringType, IntegerType, EntityRefType
+from interpreter.entities_ast import Module, Entity, Feature, StringType, IntegerType, EntityRefType
 from interpreter.interpreter import Interpreter
 
 

@@ -9,6 +9,20 @@ class Module(Node):
     entities: list[Entity] = field(default_factory=list)
     observers: list[OnFeatureChange] = field(default_factory=list)
 
+    def add_entity(self, name) -> Entity:
+        e = Entity()
+        e.name = name
+        self.entities.append(e)
+        return e
+
+    def get_entity_by_name(self, entity_name) -> Entity:
+        matches = [e for e in self.entities if e.name == entity_name]
+        if len(matches) != 1:
+            raise Exception("One entity expected")
+        e = matches[0]
+        return e
+
+
 @dataclass
 class Entity(Node):
     name: str = field(default=None)

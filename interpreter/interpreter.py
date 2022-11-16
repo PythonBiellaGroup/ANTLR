@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from interpreter.ast import Entity, Module, StringType, BooleanType, IntegerType, EntityRefType
+from interpreter.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, EntityRefType
 from interpreter.controller import Controller
 
 
@@ -42,3 +42,9 @@ class Interpreter:
 
     def set_value(self, entity: Entity, feature_name: str, value: Any) -> None:
         pass
+
+    def instances_by_entity_name(self, entity_name):
+        e = self.module.get_entity_by_name(entity_name)
+        if e not in self.instances_by_entity:
+            self.instances_by_entity[e] = []
+        return self.instances_by_entity[e]
