@@ -2,7 +2,8 @@ from typing import Any, List, Optional, Iterable
 
 from interpreter.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, EntityRefType
 from interpreter.controller import Controller
-from interpreter.script_ast import CreateStatement, Script, SetStatement, ReferenceExpression, StringLiteralExpression
+from interpreter.script_ast import CreateStatement, Script, SetStatement, ReferenceExpression, StringLiteralExpression, \
+    PrintStatement
 
 
 class EntityInstance:
@@ -23,13 +24,14 @@ class EntityInstance:
 class Interpreter:
     module: Module
     instances_by_entity: dict
-    logs: List[str]
+    output: List[str]
 
     def __init__(self, module: Module, controller: Controller):
         self.module = module
         self.instances_by_entity = {}
         self.logs = ['Interpreter initialized']
         self.next_id = 1
+        self.output = []
 
     def __instantiate_entity__(self, entity: Entity) -> None:
         new_instance = EntityInstance()
@@ -118,5 +120,8 @@ class Interpreter:
             instance = self.evaluate_expression(statement.instance, symbol_table)
             value = self.evaluate_expression(statement.value, symbol_table)
             instance.set_feature(statement.feature.referred, value)
+        elif isinstance(statement, PrintStatement):
+            message = self.evaluate_expression(statement.message, symbol_table)
+            self.output.append(message)
         else:
             raise Exception("Unable to execute statement %s" % str(statement))

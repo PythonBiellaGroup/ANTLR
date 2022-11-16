@@ -8,7 +8,7 @@ from interpreter.controller import Controller
 from interpreter.entities_ast import Module, Entity, Feature, StringType, IntegerType, EntityRefType
 from interpreter.interpreter import Interpreter
 from interpreter.script_ast import Script, CreateStatement, StringLiteralExpression, \
-    ReferenceExpression, SetStatement
+    ReferenceExpression, SetStatement, PrintStatement
 
 
 class DummyController(object):
@@ -83,6 +83,21 @@ class InterpreterTest(unittest.TestCase):
         self.assertEqual(1, c1.id)
         self.assertEqual("Acme Inc.", c1['name'])
         self.assertEqual("<unspecified>", c1['address'])
+
+    def test_print_statement(self):
+        module = self.simple_module()
+        controller = Controller()
+        interpreter = Interpreter(module, controller)
+
+        self.assertEqual([], interpreter.output)
+        script = Script(statements=[
+            PrintStatement(
+                message=StringLiteralExpression("My beautiful message")
+            ),
+        ])
+        interpreter.run_script(script)
+        self.assertEqual(["My beautiful message"], interpreter.output)
+
 
     # def test_instance_has_default_values(self):
     #     m = Module()
