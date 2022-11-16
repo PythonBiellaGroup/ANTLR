@@ -1,10 +1,11 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
 from interpreter.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, EntityRefType
 from interpreter.controller import Controller
 
 
 class EntityInstance:
+    id: int
     entity: Entity
     values: dict
 
@@ -19,9 +20,12 @@ class Interpreter:
         self.module = module
         self.instances_by_entity = {}
         self.logs = ['Interpreter initialized']
+        self.next_id = 1
 
     def instantiate_entity(self, entity: Entity) -> None:
-        new_instance = EntityInstance
+        new_instance = EntityInstance()
+        new_instance.id = self.next_id
+        self.next_id = self.next_id + 1
         new_instance.entity = entity
         new_instance.values = {}
         for feature in entity.features:
@@ -51,3 +55,12 @@ class Interpreter:
         if e not in self.instances_by_entity:
             self.instances_by_entity[e] = []
         return self.instances_by_entity[e]
+
+    def instances_by_id(self, entity_name, instance_id) -> Optional[EntityInstance]:
+        e = self.module.get_entity_by_name(entity_name)
+        if e not in self.instances_by_entity:
+            return None
+        matches = [i for i in self.instances_by_entity[e] if i.id == instance_id]
+        if len(matches) != 1:
+            raise Exception("one instance expected")
+        return matches[0]

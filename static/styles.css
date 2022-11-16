@@ -1,5 +1,5 @@
-.add-button {
-    margin: 20px;
+.add-button, .run-button {
+    margin: 40px 0px;
     background-color: darkgreen;
     color: white;
     padding: 5px;
@@ -11,4 +11,63 @@ table {
 
 thead {
     background-color: #cccccc;
+}
+
+html {
+    font-family: system-ui;
+    margin:0;
+    padding:0;
+}
+
+body {
+    margin-top: -15px;
+    font-family: system-ui;
+}
+
+.navigation {
+    padding-top:15px;
+-webkit-box-shadow: 0px 5px 5px 0px rgba(0,0,0,0.75);
+-moz-box-shadow: 0px 5px 5px 0px rgba(0,0,0,0.75);
+box-shadow: 0px 5px 5px 0px rgba(0,0,0,0.75);
+    background-color: azure;
+}
+
+.navigation h2 {
+    font-family: system-ui;
+    font-size: 10pt;
+    font-weight: 500;
+    margin: 10pt;
+}
+
+.navigation-menu {
+    margin:0;
+    padding:0;
+    border-bottom: 1px black solid;
+}
+
+.navigation-menu li {
+    display: inline-block;
+    /*border-right: 1px black solid;*/
+    margin: 5px;
+    padding: 5px;
+    text-decoration: none;
+}
+
+.navigation-menu li:hover {
+    background-color: orange;
+}
+
+.actions {
+    margin-top: 20px;
+
+}
+
+td {
+    padding: 10px;
+    border: 1px gray solid;
+}
+
+.container {
+    margin-top: 20px;
+    margin-bottom: 30px;
 }

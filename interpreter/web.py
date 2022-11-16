@@ -1,4 +1,6 @@
-from flask import Flask, render_template, redirect, url_for
+import json
+
+from flask import Flask, render_template, redirect, url_for, request
 
 from interpreter.controller import Controller
 from interpreter.entities_ast import Module, Entity
@@ -36,10 +38,26 @@ def create_app():
         # redirect
         return redirect("/entity/%s" % entity_name)
 
+    @app.route('/run', methods = ['POST'])
+    def run_script():
+        print("request %s" % str(request.json))
+        answer = {}
+        answer['ok'] = True
+        answer['issues'] = ['Foo']
+        return json.dumps(answer)
+
+
+    @app.route('/entity/<string:entity_name>/show/<int:instance_id>')
+    def instance_page(entity_name, instance_id):
+        return render_template('instance.html',
+                               entities=module.entities,
+                               entity=module.get_entity_by_name(entity_name),
+                               instance=interpreter.instances_by_id(entity_name, instance_id), logs=interpreter.logs)
 
     @app.route('/entity/<string:entity_name>/')
     def entity_page(entity_name):
         return render_template('entities.html',
+                               entities=module.entities,
                                entity=module.get_entity_by_name(entity_name),
                                instances=interpreter.instances_by_entity_name(entity_name), logs=interpreter.logs)
 

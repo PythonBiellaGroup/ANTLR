@@ -12,20 +12,25 @@
                     {% for f in entity.features %}
                         <td><b>{{f.name}}</b></td>
                     {% endfor %}
-                    <td>Actions</td>
+                    <td><b>actions</b></td>
                 </tr>
                 </thead>
                 {% for i in instances %}
                     <tr>
                         {% for f in entity.features %}
-                            <td><i>{{i.values[f]}}</i><a href="/entity/{{entity.name}}/edit/{{i.index}}/{{f.name}}">Edit</a></td>
+                            <td><i>{{i.values[f]}}</i>                             </td>
                         {% endfor %}
-                        <td><a href="/entity/{{entity.name}}/delete/{{i.index}}">Delete</a></td>
+                        <td>
+                            <a href="/entity/{{entity.name}}/show/{{ i.id }}"><i class="icon-circle-arrow-right"></i></a>
+                            <a href="/entity/{{entity.name}}/delete/{{ i.id }}"><i class="icon-eraser"></i></a>
+                        </td>
                     </tr>
                 {% endfor %}
+
             </table>
         {% endif %}
-        <br/>
-        <a class="add-button" href="/entity/{{ entity.name }}/add">Add {{entity.name}}</a>
+        <div class="actions">
+            <a class="add-button" href="/entity/{{ entity.name }}/add">Add {{entity.name}}</a>
+        </div>
     </div>
 {% endblock %}
