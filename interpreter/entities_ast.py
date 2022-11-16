@@ -7,7 +7,6 @@ from pylasu.model.naming import ReferenceByName
 @dataclass
 class Module(Node):
     entities: list[Entity] = field(default_factory=list)
-    observers: list[OnFeatureChange] = field(default_factory=list)
 
     def add_entity(self, name) -> Entity:
         e = Entity()
@@ -43,7 +42,6 @@ class Entity(Node):
 class Feature(Node):
     name: str = field(default=None)
     type: Type = field(default=None)
-    calculated: bool = field(default=False)
     many: bool = field(default=False)
 
     def __hash__(self) -> int:
@@ -68,25 +66,3 @@ class BooleanType(Type):
 @dataclass
 class EntityRefType(Type):
     entity: ReferenceByName = field(default=None)
-
-@dataclass
-class OnFeatureChange:
-    entity: ReferenceByName = field(default=None)
-    feature: ReferenceByName = field(default=None)
-    statements: list[Statement] = field(default_factory=list)
-
-@dataclass
-class Statement(Node):
-    pass
-
-@dataclass
-class Expression(Node):
-    pass
-
-@dataclass
-class PrintStatement(Statement):
-    message: Expression = field(default=None)
-
-@dataclass
-class ReferenceExpression(Expression):
-    what: ReferenceByName = field(default=None)
