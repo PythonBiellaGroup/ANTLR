@@ -4,3 +4,11 @@
     color: white;
     padding: 5px;
 }
+
+table {
+    border: 1px black solid;
+}
+
+thead {
+    background-color: #cccccc;
+}

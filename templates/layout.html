@@ -12,6 +12,14 @@
   <body>
     {% include 'navigation.html' %}
     {% block content %}{% endblock %}
+    <div>
+      <h2>Logs</h2>
+      <ul>
+        {% for msg in logs %}
+          <li>{{msg}}</li>
+        {% endfor %}
+      </ul>
+    </div>
   </body>
 
 </html>

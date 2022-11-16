@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 
 from interpreter.controller import Controller
 from interpreter.entities_ast import Module, Entity
@@ -9,6 +9,9 @@ def load_module() -> Module:
     m = Module()
 
     client = m.add_entity("Client")
+    client.add_str_feature("name")
+    client.add_str_feature("address")
+
     project = m.add_entity("Project")
 
     return m
@@ -26,11 +29,19 @@ def create_app():
     module = load_module()
     interpreter = load_interpreter(module)
 
+    @app.route('/entity/<string:entity_name>/add')
+    def add_entity(entity_name):
+        # call interpreter
+        interpreter.instantiate_entity(module.get_entity_by_name(entity_name))
+        # redirect
+        return redirect("/entity/%s" % entity_name)
+
+
     @app.route('/entity/<string:entity_name>/')
     def entity_page(entity_name):
         return render_template('entities.html',
                                entity=module.get_entity_by_name(entity_name),
-                               instances=interpreter.instances_by_entity_name(entity_name))
+                               instances=interpreter.instances_by_entity_name(entity_name), logs=interpreter.logs)
 
     @app.route('/')
     def index_page():
@@ -40,6 +51,6 @@ def create_app():
                 nb_of_entities[e.name] = 0
             else:
                 nb_of_entities[e.name] = len(interpreter.instances_by_entity[e])
-        return render_template('index.html', entities=module.entities, nb_of_entities=nb_of_entities)
+        return render_template('index.html', entities=module.entities, nb_of_entities=nb_of_entities, logs=interpreter.logs)
 
     return app

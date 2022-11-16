@@ -13,10 +13,12 @@ class EntityInstance:
 class Interpreter:
     module: Module
     instances_by_entity: dict
+    logs: List[str]
 
     def __init__(self, module: Module, controller: Controller):
         self.module = module
         self.instances_by_entity = {}
+        self.logs = ['Interpreter initialized']
 
     def instantiate_entity(self, entity: Entity) -> None:
         new_instance = EntityInstance
@@ -39,6 +41,7 @@ class Interpreter:
         if entity not in self.instances_by_entity:
             self.instances_by_entity[entity] = []
         self.instances_by_entity[entity].append(new_instance)
+        self.logs.append("Added instance of %s: %s" % (entity, new_instance))
 
     def set_value(self, entity: Entity, feature_name: str, value: Any) -> None:
         pass

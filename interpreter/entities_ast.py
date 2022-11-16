@@ -31,6 +31,14 @@ class Entity(Node):
     def __hash__(self) -> int:
         return self.name.__hash__()
 
+    def add_str_feature(self, name) -> Feature:
+        f = Feature()
+        f.name = name
+        f.type = StringType()
+        self.features.append(f)
+        return f
+
+
 @dataclass
 class Feature(Node):
     name: str = field(default=None)

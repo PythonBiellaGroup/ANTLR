@@ -6,8 +6,26 @@
         {% if instances|length == 0 %}
             <i>No instances</i>
         {% else %}
+            <table>
+                <thead>
+                <tr>
+                    {% for f in entity.features %}
+                        <td><b>{{f.name}}</b></td>
+                    {% endfor %}
+                    <td>Actions</td>
+                </tr>
+                </thead>
+                {% for i in instances %}
+                    <tr>
+                        {% for f in entity.features %}
+                            <td><i>{{i.values[f]}}</i><a href="/entity/{{entity.name}}/edit/{{i.index}}/{{f.name}}">Edit</a></td>
+                        {% endfor %}
+                        <td><a href="/entity/{{entity.name}}/delete/{{i.index}}">Delete</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
         {% endif %}
         <br/>
-        <button class="add-button">Add {{entity.name}}</button>
+        <a class="add-button" href="/entity/{{ entity.name }}/add">Add {{entity.name}}</a>
     </div>
 {% endblock %}
