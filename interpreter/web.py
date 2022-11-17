@@ -1,9 +1,9 @@
 import json
 
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, request
 
 from interpreter.controller import Controller
-from interpreter.entities_ast import Module, Entity
+from interpreter.entities_parser.entities_ast import Module
 from interpreter.interpreter import Interpreter
 
 
@@ -28,6 +28,7 @@ def load_interpreter(module: Module) -> Interpreter:
 def create_app():
     # create and configure the app
     app = Flask("SimpleTable", template_folder='templates', static_folder='static')
+    # TODO look for file my.entities and load the module form there
     module = load_module()
     interpreter = load_interpreter(module)
 

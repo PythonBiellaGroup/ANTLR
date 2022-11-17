@@ -1,10 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from enum import Enum
 from pylasu.model import Node
 from pylasu.model.naming import ReferenceByName
 
-from interpreter.entities_ast import Entity
+from interpreter.entities_parser.entities_ast import Entity
 
 
 @dataclass

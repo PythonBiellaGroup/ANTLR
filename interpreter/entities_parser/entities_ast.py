@@ -6,6 +6,7 @@ from pylasu.model.naming import ReferenceByName
 
 @dataclass
 class Module(Node):
+    name: str = field(default=None)
     entities: list[Entity] = field(default_factory=list)
 
     def add_entity(self, name) -> Entity:

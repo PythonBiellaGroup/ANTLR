@@ -4,29 +4,23 @@ from antlr4 import CommonTokenStream, InputStream
 
 from entity_parser.AntlrEntityLexer import AntlrEntityLexer
 from entity_parser.AntlrEntityParser import AntlrEntityParser
+from script_parser.AntlrScriptLexer import AntlrScriptLexer
+from script_parser.AntlrScriptParser import AntlrScriptParser
 
 
-class ParserTest(unittest.TestCase):
+class ScriptParserTest(unittest.TestCase):
     def test_parse_module(self):
-        code = '''module Insurance {
-    entity Vehicle {
-        licensePlate: string;
-        year: integer;
-        owner: Person;
-    }
-
-    entity Person {
-        name: string;
-        address: string;
-    }
-}'''
+        code = '''
+        create Client as c
+        set name of c to 'ACME Inc.'
+        create Product as p1
+        set value of p1 to (1500 + 200) / 2
+        print concat('Value of product #1 is: ', value of p1)
+        '''
         input = InputStream(code)
-        lexer = AntlrEntityLexer(input)
+        lexer = AntlrScriptLexer(input)
         token_stream = CommonTokenStream(lexer)
-        # Verifico che il quarto token sia di tipo ENTITY
-        self.assertEqual(token_stream.LT(4).type, lexer.ENTITY)
-        self.assertEqual(token_stream.LT(4).text, "entity")
-        parser = AntlrEntityParser(token_stream)
+        parser = AntlrScriptParser(token_stream)
         tree = parser.module()
         self.assertIsInstance(tree, AntlrEntityParser.ModuleContext)
         self.assertIsInstance(tree.getChild(4), AntlrEntityParser.EntityContext)

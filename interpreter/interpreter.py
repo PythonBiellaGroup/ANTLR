@@ -1,6 +1,6 @@
-from typing import Any, List, Optional, Iterable
+from typing import Any, List, Optional
 
-from interpreter.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, EntityRefType
+from interpreter.entities_parser.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, EntityRefType
 from interpreter.controller import Controller
 from interpreter.script_ast import CreateStatement, Script, SetStatement, ReferenceExpression, StringLiteralExpression, \
     PrintStatement
