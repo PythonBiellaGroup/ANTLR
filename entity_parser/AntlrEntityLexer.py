@@ -1,4 +1,4 @@
-# Generated from AntlrScriptLexer.g4 by ANTLR 4.11.1
+# Generated from AntlrEntityLexer.g4 by ANTLR 4.11.1
 from antlr4 import *
 from io import StringIO
 import sys
@@ -44,7 +44,7 @@ def serializedATN():
         26,1,0,0,0,3,0,79,84,1,0,1,0
     ]
 
-class AntlrScriptLexer(Lexer):
+class AntlrEntityLexer(Lexer):
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -79,7 +79,7 @@ class AntlrScriptLexer(Lexer):
     ruleNames = [ "INTEGER", "BOOLEAN", "STRING", "ENTITY", "MODULE", "COLON", 
                   "SEMI", "LSQRD", "RSQRD", "LCRLY", "RCRLY", "ID", "WS" ]
 
-    grammarFileName = "AntlrScriptLexer.g4"
+    grammarFileName = "AntlrEntityLexer.g4"
 
     def __init__(self, input=None, output:TextIO = sys.stdout):
         super().__init__(input, output)

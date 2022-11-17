@@ -11,7 +11,6 @@ LCRLY=10
 RCRLY=11
 ID=12
 WS=13
-STATEMENT=14
 'integer'=1
 'boolean'=2
 'string'=3

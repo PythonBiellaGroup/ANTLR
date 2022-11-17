@@ -53,16 +53,16 @@ class EntityParserTest(unittest.TestCase):
         result = EntitiesPylasuParser().parse(code)
         self.assertEqual([], result.issues)
         person = Entity(name='Person',
-           features=[
-               Feature(name='name', type=StringType()),
-               Feature(name='address', type=StringType()),
-           ])
+                        features=[
+                            Feature(name='name', type=StringType()),
+                            Feature(name='address', type=StringType()),
+                        ])
         vehicle = Entity(name='Vehicle',
-           features=[
-               Feature(name='licensePlate', type=StringType()),
-               Feature(name='year', type=IntegerType()),
-               Feature(name='owner', type=EntityRefType(entity=ReferenceByName(name='Person'))),
-           ])
+                         features=[
+                             Feature(name='licensePlate', type=StringType()),
+                             Feature(name='year', type=IntegerType()),
+                             Feature(name='owner', type=EntityRefType(entity=ReferenceByName(name='Person'))),
+                         ])
         self.assertEqual(Module(
             name='Insurance',
             entities=[

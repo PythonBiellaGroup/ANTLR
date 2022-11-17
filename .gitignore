@@ -96,4 +96,6 @@ ENV/
 .idea/
 
 # Generated parser
-entity_parser/
+entity_parser
+script_parser
+gen

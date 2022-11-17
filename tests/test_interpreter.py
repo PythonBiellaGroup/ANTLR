@@ -6,7 +6,7 @@ from pylasu.model.naming import ReferenceByName
 from interpreter.controller import Controller
 from interpreter.entities_parser.entities_ast import Module, Entity
 from interpreter.interpreter import Interpreter
-from interpreter.script_ast import Script, CreateStatement, StringLiteralExpression, \
+from interpreter.script_parser.script_ast import Script, CreateStatement, StringLiteralExpression, \
     ReferenceExpression, SetStatement, PrintStatement
 
 
@@ -97,6 +97,8 @@ class InterpreterTest(unittest.TestCase):
         ])
         interpreter.run_script(script)
         self.assertEqual(["My beautiful message"], interpreter.output)
+
+    Testare anche Entity #1
 
     # def test_field_access(self):
     #     module = self.simple_module()

@@ -6,6 +6,7 @@ from entity_parser.AntlrEntityParser import AntlrEntityParser
 from interpreter.entities_parser.entities_ast import Module
 from interpreter.entities_parser.entities_parsetree_converter import to_ast
 
+
 class EntitiesPylasuParser:
 
     def parse(self, code: str) -> Result:

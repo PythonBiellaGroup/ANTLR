@@ -30,10 +30,6 @@ class CreateStatement(Statement):
     def __hash__(self) -> int:
         return self.name.__hash__()
 
-# @dataclass
-# class DeclarationStatement(Statement):
-#     name: str = field(default=None)
-#     value: Expression = field(default=None)
 
 @dataclass
 class SetStatement(Statement):
@@ -66,6 +62,21 @@ class IntLiteralExpression(Expression):
 
 @dataclass
 class SumExpression(Expression):
+    left: Expression = field(default=None)
+    right: Expression = field(default=None)
+
+@dataclass
+class SubtractionExpression(Expression):
+    left: Expression = field(default=None)
+    right: Expression = field(default=None)
+
+@dataclass
+class DivisionExpression(Expression):
+    left: Expression = field(default=None)
+    right: Expression = field(default=None)
+
+@dataclass
+class MultiplicationExpression(Expression):
     left: Expression = field(default=None)
     right: Expression = field(default=None)
 

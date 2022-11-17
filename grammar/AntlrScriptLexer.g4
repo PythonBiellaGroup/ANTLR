@@ -21,9 +21,25 @@ LSQRD: '[';
 RSQRD: ']';
 LCRLY: '{';
 RCRLY: '}';
+LPAREN: '(';
+RPAREN: ')';
+
+DIV: '/';
+MULT: '*';
+PLUS: '+';
+MINUS: '-';
+
+CREATE: 'create';
+AS: 'as';
+SET: 'set';
+OF: 'of';
+TO: 'to';
+PRINT: 'print';
 
 // Nomi (o identifier)
-ID: [A-Z]+; // Notare il pattern tipo espressione regolare
+ID: [a-zA-Z][a-zA-Z0-9_]*; // Notare il pattern tipo espressione regolare
+INT_VALUE: '0'|[1-9][0-9]*;
+STR_VALUE: '\'' ~['\r\n]* '\'';
 
 // I caratteri di spaziatura non ci interessano, 
 // dunque li nascondiamo al parser

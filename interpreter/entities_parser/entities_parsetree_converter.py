@@ -3,7 +3,6 @@ from pylasu.support import extension_method
 from pylasu.validation import Issue
 
 from interpreter.entities_parser.entities_ast import Module, Entity, Feature, StringType, IntegerType, EntityRefType
-from interpreter.script_ast import Script
 from entity_parser.AntlrEntityParser import AntlrEntityParser
 
 

@@ -1,29 +1,54 @@
 import unittest
 
-from antlr4 import CommonTokenStream, InputStream
+from pylasu.model.naming import ReferenceByName
+from pylasu.validation.validation import Result
 
-from entity_parser.AntlrEntityLexer import AntlrEntityLexer
-from entity_parser.AntlrEntityParser import AntlrEntityParser
-from script_parser.AntlrScriptLexer import AntlrScriptLexer
-from script_parser.AntlrScriptParser import AntlrScriptParser
+from interpreter.script_parser.script_ast import Script, SetStatement, CreateStatement, PrintStatement, StringLiteralExpression, \
+    IntLiteralExpression, SumExpression, DivisionExpression, GetFeatureValueExpression, ConcatExpression, \
+    ReferenceExpression
+from interpreter.script_parser.script_pylasu_parser import ScriptPylasuParser
 
 
 class ScriptParserTest(unittest.TestCase):
-    def test_parse_module(self):
+    def test_pylasu_parse_script(self):
+        # code = '''
+        # create Client as c
+        # set name of c to 'ACME Inc.'
+        # create Product as p1
+        # set value of p1 to (1500 + 200) / 2
+        # print concat('Value of product #1 is: ', value of p1)
+        # '''
         code = '''
         create Client as c
         set name of c to 'ACME Inc.'
         create Product as p1
         set value of p1 to (1500 + 200) / 2
-        print concat('Value of product #1 is: ', value of p1)
         '''
-        input = InputStream(code)
-        lexer = AntlrScriptLexer(input)
-        token_stream = CommonTokenStream(lexer)
-        parser = AntlrScriptParser(token_stream)
-        tree = parser.module()
-        self.assertIsInstance(tree, AntlrEntityParser.ModuleContext)
-        self.assertIsInstance(tree.getChild(4), AntlrEntityParser.EntityContext)
-        self.assertEqual(2, len(tree.entities))
-        self.assertIsInstance(tree.entities[0], AntlrEntityParser.EntityContext)
-        self.assertEqual(0, parser.getNumberOfSyntaxErrors())
+        result = ScriptPylasuParser().parse(code)
+        print(str(result.issues))
+        self.assertEqual(0, len(result.issues))
+        self.assertEqual(Result(issues=[], root=Script(statements=[
+            CreateStatement(entity=ReferenceByName(name='Client'), name='c'),
+            SetStatement(instance=ReferenceExpression(what=ReferenceByName(name='c')),
+                         feature=ReferenceByName(name='name'),
+                         value=StringLiteralExpression(value='ACME Inc.')),
+            CreateStatement(entity=ReferenceByName(name='Product'), name='p1'),
+            SetStatement(instance=ReferenceExpression(what=ReferenceByName(name='p1')),
+                         feature=ReferenceByName(name='value'),
+                         value=DivisionExpression(
+                             left=SumExpression(
+                                 left=IntLiteralExpression(value=500),
+                                 right=IntLiteralExpression(value=200),
+                             ),
+                             right=IntLiteralExpression(value=2)
+                         )),
+            PrintStatement(
+                message=ConcatExpression(
+                    left=StringLiteralExpression(value='Value of product #1 is: '),
+                    right=GetFeatureValueExpression(
+                        instance=ReferenceExpression(what=ReferenceByName(name='p1')),
+                        feature=ReferenceByName(name='value'),
+                    )
+                )
+            )]
+        )), result)

@@ -5,11 +5,24 @@ options {
 }
 
 script:
-    STATEMENT*
+    (statements+=statement)*
     EOF
     ;
 
 statement:
+      CREATE entity=ID (AS var_name=ID)? #create_statement
+    | SET feature=ID OF instance=expression TO value=expression #set_statement
+    | PRINT message=expression #print_statement
+    ;
+
+expression:
+      name=ID #reference_expression
+    | MINUS expression #minus_expression
+    | INT_VALUE #int_literal_expression
+    | STR_VALUE #string_literal_expression
+    | left=expression op=(DIV|MULT) right=expression #div_mult_expression
+    | left=expression op=(PLUS|MINUS) right=expression #sum_sub_expression
+    | LPAREN expression RPAREN #parens_expression
     ;
 
 
