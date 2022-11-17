@@ -28,6 +28,7 @@ DIV: '/';
 MULT: '*';
 PLUS: '+';
 MINUS: '-';
+HASH: '#';
 
 CREATE: 'create';
 AS: 'as';
@@ -35,6 +36,8 @@ SET: 'set';
 OF: 'of';
 TO: 'to';
 PRINT: 'print';
+CONCAT: 'concat';
+AND: 'and';
 
 // Nomi (o identifier)
 ID: [a-zA-Z][a-zA-Z0-9_]*; // Notare il pattern tipo espressione regolare

@@ -38,6 +38,13 @@ class Entity(Node):
         self.features.append(f)
         return f
 
+    def add_int_feature(self, name) -> Feature:
+        f = Feature()
+        f.name = name
+        f.type = IntegerType()
+        self.features.append(f)
+        return f
+
 
 @dataclass
 class Feature(Node):

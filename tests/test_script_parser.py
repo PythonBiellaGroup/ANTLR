@@ -10,19 +10,14 @@ from interpreter.script_parser.script_pylasu_parser import ScriptPylasuParser
 
 
 class ScriptParserTest(unittest.TestCase):
+
     def test_pylasu_parse_script(self):
-        # code = '''
-        # create Client as c
-        # set name of c to 'ACME Inc.'
-        # create Product as p1
-        # set value of p1 to (1500 + 200) / 2
-        # print concat('Value of product #1 is: ', value of p1)
-        # '''
         code = '''
         create Client as c
         set name of c to 'ACME Inc.'
         create Product as p1
         set value of p1 to (1500 + 200) / 2
+        print concat 'Value of product #1 is: ' and value of p1
         '''
         result = ScriptPylasuParser().parse(code)
         print(str(result.issues))
@@ -37,7 +32,7 @@ class ScriptParserTest(unittest.TestCase):
                          feature=ReferenceByName(name='value'),
                          value=DivisionExpression(
                              left=SumExpression(
-                                 left=IntLiteralExpression(value=500),
+                                 left=IntLiteralExpression(value=1500),
                                  right=IntLiteralExpression(value=200),
                              ),
                              right=IntLiteralExpression(value=2)

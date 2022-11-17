@@ -4,6 +4,7 @@ from pylasu.model import Node
 from pylasu.model.naming import ReferenceByName
 
 from interpreter.entities_parser.entities_ast import Entity
+from interpreter.script_parser.types import Type
 
 
 @dataclass
@@ -16,7 +17,7 @@ class Statement(Node):
 
 @dataclass
 class Expression(Node):
-    pass
+    entity_type: Type = field(default=None)
 
 @dataclass
 class PrintStatement(Statement):
@@ -40,7 +41,6 @@ class SetStatement(Statement):
 @dataclass
 class ReferenceExpression(Expression):
     what: ReferenceByName = field(default=None)
-    entity_type: Entity = field(default=None)
 
 @dataclass
 class GetInstanceExpression(Expression):
@@ -84,3 +84,7 @@ class MultiplicationExpression(Expression):
 class ConcatExpression(Expression):
     left: Expression = field(default=None)
     right: Expression = field(default=None)
+
+@dataclass
+class ErrorExpression(Expression):
+    pass

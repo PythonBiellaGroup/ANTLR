@@ -8,6 +8,7 @@ from interpreter.entities_parser.entities_ast import Module, Entity
 from interpreter.interpreter import Interpreter
 from interpreter.script_parser.script_ast import Script, CreateStatement, StringLiteralExpression, \
     ReferenceExpression, SetStatement, PrintStatement
+from interpreter.script_parser.script_pylasu_parser import ScriptPylasuParser
 
 
 class DummyController(object):
@@ -98,7 +99,23 @@ class InterpreterTest(unittest.TestCase):
         interpreter.run_script(script)
         self.assertEqual(["My beautiful message"], interpreter.output)
 
-    Testare anche Entity #1
+    def test_access_expression(self):
+        module = self.simple_module()
+        controller = Controller()
+        interpreter = Interpreter(module, controller)
+
+        script_code = '''
+        create Client
+        set name of Client #1 to 'ACME Inc.'
+        create Product
+        set value of Product #1 to (1500 + 200) / 2
+        print concat 'Value of product #1 is: ' and value of Product #1
+        '''
+        self.assertEqual([], interpreter.output)
+        result = ScriptPylasuParser().parse(script_code)
+        self.assertEqual([], result.issues)
+        interpreter.run_script(result.root)
+        self.assertEqual(["Value of product #1 is: 1,100"], interpreter.output)
 
     # def test_field_access(self):
     #     module = self.simple_module()

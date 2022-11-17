@@ -10,6 +10,7 @@ from interpreter.entities_parser.entities_pylasu_parser import EntitiesPylasuPar
 
 
 class EntityParserTest(unittest.TestCase):
+
     def test_antlr_parse_module(self):
         code = '''module Insurance {
     entity Vehicle {

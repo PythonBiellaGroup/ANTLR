@@ -2,8 +2,10 @@ from typing import Any, List, Optional
 
 from interpreter.entities_parser.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, EntityRefType
 from interpreter.controller import Controller
-from interpreter.script_parser.script_ast import CreateStatement, Script, SetStatement, ReferenceExpression, StringLiteralExpression, \
-    PrintStatement
+from interpreter.script_parser.script_ast import CreateStatement, Script, SetStatement, ReferenceExpression, \
+    StringLiteralExpression, \
+    PrintStatement, GetInstanceExpression
+from interpreter.script_parser.types import EntityType
 
 
 class EntityInstance:
@@ -82,11 +84,16 @@ class Interpreter:
             s.entity.try_to_resolve(self.module.entities)
         for e in script.walk_descendants(restrict_to=ReferenceExpression):
             e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
-            e.entity_type = e.what.referred.entity.referred
+            e.type = EntityType(e.what.referred.entity.referred)
+        # for e in script.walk_descendants(restrict_to=GetInstanceExpression):
+        #     e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
+        #     e.entity_type = e.what.referred.entity.referred
         for s in script.walk_descendants(restrict_to=SetStatement):
             if s.instance is None:
                 raise Exception("We did not expected s.instance to be null for %s" % str(s.instance))
-            entity = s.instance.entity_type
+            if s.instance.type is None:
+                raise Exception("We did not expected s.instance to be null for %s" % str(s.instance))
+            entity = s.instance.type.entity
             if entity is None:
                 raise Exception("We did not expected entity to be null for %s" % str(s))
             s.feature.try_to_resolve(entity.features)
