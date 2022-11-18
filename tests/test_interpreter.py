@@ -115,7 +115,7 @@ class InterpreterTest(unittest.TestCase):
         result = ScriptPylasuParser().parse(script_code)
         self.assertEqual([], result.issues)
         interpreter.run_script(result.root)
-        self.assertEqual(["Value of product #1 is: 1,100"], interpreter.output)
+        self.assertEqual(["Value of product #1 is: 850"], interpreter.output)
 
     # def test_field_access(self):
     #     module = self.simple_module()

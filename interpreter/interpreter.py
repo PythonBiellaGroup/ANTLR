@@ -1,11 +1,15 @@
+from dataclasses import dataclass
 from typing import Any, List, Optional
 
-from interpreter.entities_parser.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, EntityRefType
+from pylasu.model import Node
+
+from interpreter.entities_parser.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, \
+    EntityRefType, Type
 from interpreter.controller import Controller
 from interpreter.script_parser.script_ast import CreateStatement, Script, SetStatement, ReferenceExpression, \
     StringLiteralExpression, \
-    PrintStatement, GetInstanceExpression
-from interpreter.script_parser.types import EntityType
+    PrintStatement, GetInstanceExpression, IntLiteralExpression, DivisionExpression, SumExpression, ConcatExpression, \
+    GetFeatureValueExpression
 
 
 class EntityInstance:
@@ -21,6 +25,32 @@ class EntityInstance:
 
     def set_feature(self, feature, value):
         self.values[feature] = value
+
+
+@dataclass
+class RType(Node):
+    pass
+
+@dataclass
+class RStringType(Type):
+    pass
+
+@dataclass
+class RIntegerType(Type):
+    pass
+
+@dataclass
+class RBooleanType(Type):
+    pass
+
+@dataclass
+class REntityRefType(Type):
+    entity: Entity
+
+    def __init__(self, entity: Entity):
+        if entity is None:
+            raise Exception("Unresolved")
+        self.entity = entity
 
 
 class Interpreter:
@@ -79,26 +109,41 @@ class Interpreter:
             raise Exception("one instance expected")
         return matches[0]
 
+    def __calc_type__(self, script: Script, node: Node) -> RType:
+        if isinstance(node, ReferenceExpression):
+            return REntityRefType(node.what.referred.entity.referred)
+        elif isinstance(node, GetInstanceExpression):
+            return REntityRefType(node.entity.referred)
+        else:
+            raise Exception("Unable to calculate type for %s" % (str(node)))
+
     def __resolve__(self, script: Script):
+        for s in script.walk_descendants(restrict_to=GetInstanceExpression):
+            s.entity.try_to_resolve(self.module.entities)
         for s in script.walk_descendants(restrict_to=CreateStatement):
             s.entity.try_to_resolve(self.module.entities)
         for e in script.walk_descendants(restrict_to=ReferenceExpression):
             e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
-            e.type = EntityType(e.what.referred.entity.referred)
         # for e in script.walk_descendants(restrict_to=GetInstanceExpression):
         #     e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
         #     e.entity_type = e.what.referred.entity.referred
         for s in script.walk_descendants(restrict_to=SetStatement):
             if s.instance is None:
                 raise Exception("We did not expected s.instance to be null for %s" % str(s.instance))
-            if s.instance.type is None:
+            t = self.__calc_type__(script, s.instance)
+            if t is None:
                 raise Exception("We did not expected s.instance to be null for %s" % str(s.instance))
-            entity = s.instance.type.entity
-            if entity is None:
+            if not isinstance(t, REntityRefType):
+                raise Exception("We did not expected type of s.instance to be not an EntityRefType for %s" % str(t))
+            if t.entity is None:
                 raise Exception("We did not expected entity to be null for %s" % str(s))
+            entity = t.entity
             s.feature.try_to_resolve(entity.features)
             if not s.feature.resolved():
                 raise Exception("Unable to resolve feature reference in %s. Candidates: %s" % (str(s), str(entity.features)))
+        for s in script.walk_descendants(restrict_to=GetFeatureValueExpression):
+            e = self.__calc_type__(script, s.instance).entity
+            s.feature.try_to_resolve(entity.features)
 
     def run_script(self, script):
         self.__resolve__(script)
@@ -115,6 +160,26 @@ class Interpreter:
             return symbol_table[expression.what.referred]
         elif isinstance(expression, StringLiteralExpression):
             return expression.value
+        elif isinstance(expression, IntLiteralExpression):
+            return expression.value
+        elif isinstance(expression, DivisionExpression):
+            left = self.evaluate_expression(expression.left, symbol_table)
+            right = self.evaluate_expression(expression.right, symbol_table)
+            return int(left/right)
+        elif isinstance(expression, SumExpression):
+            left = self.evaluate_expression(expression.left, symbol_table)
+            right = self.evaluate_expression(expression.right, symbol_table)
+            return left+right
+        elif isinstance(expression, ConcatExpression):
+            left = self.evaluate_expression(expression.left, symbol_table)
+            right = self.evaluate_expression(expression.right, symbol_table)
+            return str(left)+str(right)
+        elif isinstance(expression, GetInstanceExpression):
+            index = self.evaluate_expression(expression.id, symbol_table)
+            return self.instances_by_entity[expression.entity.referred][index - 1]
+        elif isinstance(expression, GetFeatureValueExpression):
+            instance = self.evaluate_expression(expression.instance, symbol_table)
+            return instance.values[expression.feature.referred]
         else:
             raise Exception("Unable to evaluate expression %s" % str(expression))
 

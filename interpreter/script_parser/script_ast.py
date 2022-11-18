@@ -4,7 +4,6 @@ from pylasu.model import Node
 from pylasu.model.naming import ReferenceByName
 
 from interpreter.entities_parser.entities_ast import Entity
-from interpreter.script_parser.types import Type
 
 
 @dataclass
@@ -17,7 +16,7 @@ class Statement(Node):
 
 @dataclass
 class Expression(Node):
-    entity_type: Type = field(default=None)
+    pass
 
 @dataclass
 class PrintStatement(Statement):
