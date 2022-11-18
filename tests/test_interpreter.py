@@ -1,9 +1,7 @@
 import unittest
 
-#from pylasu.StrumentaLanguageSupport import ReferenceByName
 from pylasu.model.naming import ReferenceByName
 
-from interpreter.controller import Controller
 from interpreter.entities_parser.entities_ast import Module, Entity
 from interpreter.interpreter import Interpreter
 from interpreter.script_parser.script_ast import Script, CreateStatement, StringLiteralExpression, \
@@ -29,8 +27,7 @@ class InterpreterTest(unittest.TestCase):
 
     def test_creation(self):
         module = self.simple_module()
-        controller = Controller()
-        interpreter = Interpreter(module, controller)
+        interpreter = Interpreter(module)
 
         self.assertEqual(0, len(interpreter.instances_by_entity_name('Client')))
         self.assertEqual(0, len(interpreter.instances_by_entity_name('Product')))
@@ -54,8 +51,7 @@ class InterpreterTest(unittest.TestCase):
 
     def test_set_statement(self):
         module = self.simple_module()
-        controller = Controller()
-        interpreter = Interpreter(module, controller)
+        interpreter = Interpreter(module)
 
         self.assertEqual(0, len(interpreter.instances_by_entity_name('Client')))
         self.assertEqual(0, len(interpreter.instances_by_entity_name('Product')))
@@ -87,8 +83,7 @@ class InterpreterTest(unittest.TestCase):
 
     def test_print_statement(self):
         module = self.simple_module()
-        controller = Controller()
-        interpreter = Interpreter(module, controller)
+        interpreter = Interpreter(module, verbose=False)
 
         self.assertEqual([], interpreter.output)
         script = Script(statements=[
@@ -101,113 +96,19 @@ class InterpreterTest(unittest.TestCase):
 
     def test_access_expression(self):
         module = self.simple_module()
-        controller = Controller()
-        interpreter = Interpreter(module, controller)
+        interpreter = Interpreter(module, verbose=False)
 
         script_code = '''
         create Client
         set name of Client #1 to 'ACME Inc.'
         create Product
-        set value of Product #1 to (1500 + 200) / 2
-        print concat 'Value of product #1 is: ' and value of Product #1
+        set value of Product #2 to (1500 + 200) / 2
+        print concat 'Value of Product #2 is: ' and value of Product #2
         '''
         self.assertEqual([], interpreter.output)
         result = ScriptPylasuParser().parse(script_code)
         self.assertEqual([], result.issues)
         interpreter.run_script(result.root)
-        self.assertEqual(["Value of product #1 is: 850"], interpreter.output)
+        self.assertEqual(["Value of Product #2 is: 850"], interpreter.output)
 
-    # def test_field_access(self):
-    #     module = self.simple_module()
-    #     controller = Controller()
-    #     interpreter = Interpreter(module, controller)
-    #
-    #     self.assertEqual([], interpreter.output)
-    #     script = Script(statements=[
-    #         PrintStatement(
-    #             message=StringLiteralExpression("My beautiful message")
-    #         ),
-    #     ])
-    #     interpreter.run_script(script)
-    #     self.assertEqual(["My beautiful message"], interpreter.output)
-
-    # def test_complete_example(self):
-    #     module = self.simple_module()
-    #     controller = Controller()
-    #     interpreter = Interpreter(module, controller)
-    #
-    #     self.assertEqual([], interpreter.output)
-    #     script = Script(statements=[
-    #         CreateStatement(
-    #             entity=ReferenceByName[Entity]("Product"),
-    #             name="productA"
-    #         ),
-    #         SetStatement(
-    #             instance=ReferenceExpression(
-    #                 what=ReferenceByName("productA")
-    #             ),
-    #             feature=ReferenceByName("value"),
-    #             value=IntLiteralExpression(10000)
-    #         ),
-    #         CreateStatement(
-    #             entity=ReferenceByName[Entity]("Product"),
-    #             name="productB"
-    #         ),
-    #         SetStatement(
-    #             instance=ReferenceExpression(
-    #                 what=ReferenceByName("productB")
-    #             ),
-    #             feature=ReferenceByName("value"),
-    #             value=IntLiteralExpression(35000)
-    #         ),
-    #         PrintStatement(
-    #             message=ConcatExpression(
-    #                 left=StringLiteralExpression("Revenues from A: "),
-    #                 right=MultiplicationExpression(
-    #                     left=IntLiteralExpression(4),
-    #                     right=FieldAccessExpression(
-    #                         instance=ReferenceExpression("productA"),
-    #                         field=ReferenceByName("value")
-    #                 )
-    #             )
-    #         )),
-    #         PrintStatement(
-    #             message=ConcatExpression(
-    #                 left=StringLiteralExpression("Revenues from B: "),
-    #                 right=MultiplicationExpression(
-    #                     left=IntLiteralExpression(7),
-    #                     right=FieldAccessExpression(
-    #                         instance=ReferenceExpression("productB"),
-    #                         field=ReferenceByName("value")
-    #                     )
-    #                 )
-    #             ),
-    #         ),
-    #         PrintStatement(
-    #             message=ConcatExpression(
-    #                 left=StringLiteralExpression("Total revenues: "),
-    #                 right=SumExpression(
-    #                     left=MultiplicationExpression(
-    #                         left=IntLiteralExpression(7),
-    #                         right=FieldAccessExpression(
-    #                             instance=ReferenceExpression("productB"),
-    #                             field=ReferenceByName("value")
-    #                         )
-    #                     ),
-    #                     right=MultiplicationExpression(
-    #                         left=IntLiteralExpression(4),
-    #                         right=FieldAccessExpression(
-    #                             instance=ReferenceExpression("productA"),
-    #                             field=ReferenceByName("value")
-    #                         )
-    #                     )
-    #                 )
-    #             ),
-    #         )
-    #     ])
-    #     interpreter.run_script(script)
-    #     self.assertEqual([
-    #         "Revenues from A: 40,000",
-    #         "Revenues from B: 245,000"
-    #         "Total revenues: 295,000"], interpreter.output)
 

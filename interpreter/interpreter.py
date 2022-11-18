@@ -64,11 +64,15 @@ class Interpreter:
     instances_by_entity: dict
     output: List[str]
 
-    def __init__(self, module: Module):
+    def __init__(self, module: Module, verbose: bool = True):
         self.module = module
         self.instances_by_entity = {}
-        self.output = ['Interpreter initialized']
         self.next_id = 1
+        self.verbose = verbose
+        if self.verbose:
+            self.output = ['Interpreter initialized']
+        else:
+            self.output = []
 
     def instantiate_entity(self, entity: Entity) -> None:
         new_instance = EntityInstance()
@@ -93,7 +97,8 @@ class Interpreter:
         if entity not in self.instances_by_entity:
             self.instances_by_entity[entity] = []
         self.instances_by_entity[entity].append(new_instance)
-        self.output.append("Added instance of %s: %s" % (entity, new_instance))
+        if self.verbose:
+            self.output.append("Added instance of %s: %s" % (entity, new_instance))
         return new_instance
 
     def set_value(self, entity: Entity, feature_name: str, value: Any) -> None:
@@ -191,7 +196,7 @@ class Interpreter:
             id = self.evaluate_expression(expression.id, symbol_table)
             matching = [i for i in self.instances_by_entity[expression.entity.referred] if i.id == id]
             if len(matching) != 1:
-                raise Exception()
+                raise Exception("Expected one match but found %s" % str(len(matching)))
             return matching[0]
         elif isinstance(expression, GetFeatureValueExpression):
             instance = self.evaluate_expression(expression.instance, symbol_table)
