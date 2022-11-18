@@ -9,7 +9,7 @@ from interpreter.entities_parser.entities_ast import Entity, Module, StringType,
 from interpreter.script_parser.script_ast import CreateStatement, Script, SetStatement, ReferenceExpression, \
     StringLiteralExpression, \
     PrintStatement, GetInstanceExpression, IntLiteralExpression, DivisionExpression, SumExpression, ConcatExpression, \
-    GetFeatureValueExpression
+    GetFeatureValueExpression, MultiplicationExpression
 
 
 class EntityInstance:
@@ -175,6 +175,10 @@ class Interpreter:
             left = self.evaluate_expression(expression.left, symbol_table)
             right = self.evaluate_expression(expression.right, symbol_table)
             return int(left/right)
+        elif isinstance(expression, MultiplicationExpression):
+            left = self.evaluate_expression(expression.left, symbol_table)
+            right = self.evaluate_expression(expression.right, symbol_table)
+            return left*right
         elif isinstance(expression, SumExpression):
             left = self.evaluate_expression(expression.left, symbol_table)
             right = self.evaluate_expression(expression.right, symbol_table)
