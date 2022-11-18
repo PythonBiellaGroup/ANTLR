@@ -21,7 +21,14 @@
     body: JSON.stringify({ "code": code })
 })
 .then(response => response.json())
-.then(response => console.log(JSON.stringify(response)))
+.then(response => {
+  console.log(JSON.stringify(response));
+  if (response['error'] != null) {
+    alert(response['error']);
+  } else if (!response['ok']) {
+    alert(JSON.stringify(response['issues']));
+  }
+})
 .then(response => location.reload())
       }
 

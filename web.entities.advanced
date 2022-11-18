@@ -1,0 +1,18 @@
+module Entities {
+
+    entity Client {
+        name: string;
+    }
+
+    entity Project {
+        name: string;
+        client: Client;
+        value: integer;
+    }
+
+    entity Invoice {
+        amount: integer;
+        project: Project;
+    }
+
+}

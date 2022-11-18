@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Any, List, Optional
 
 from pylasu.model import Node
+from pylasu.validation import Issue, IssueType
 
 from interpreter.entities_parser.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, \
     EntityRefType, Type
@@ -115,17 +116,22 @@ class Interpreter:
 
     def __calc_type__(self, script: Script, node: Node) -> RType:
         if isinstance(node, ReferenceExpression):
+            if node.what.referred.entity.referred is None:
+                self.output.append("Entity cannot be resolved: %s" % str(node.what.referred.entity.name))
+                return None
             return REntityRefType(node.what.referred.entity.referred)
         elif isinstance(node, GetInstanceExpression):
             return REntityRefType(node.entity.referred)
         else:
             raise Exception("Unable to calculate type for %s" % (str(node)))
 
-    def __resolve__(self, script: Script):
+    def __resolve__(self, script: Script, issues: list[Issue]):
         for s in script.walk_descendants(restrict_to=GetInstanceExpression):
             s.entity.try_to_resolve(self.module.entities)
         for s in script.walk_descendants(restrict_to=CreateStatement):
-            s.entity.try_to_resolve(self.module.entities)
+            resolved = s.entity.try_to_resolve(self.module.entities)
+            if not resolved:
+                issues.append(Issue(type=IssueType.SEMANTIC, message="Cannot find entity named %s" % s.entity.name))
         for e in script.walk_descendants(restrict_to=ReferenceExpression):
             e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
         for s in script.walk_descendants(restrict_to=SetStatement):
@@ -146,11 +152,13 @@ class Interpreter:
             e = self.__calc_type__(script, s.instance).entity
             s.feature.try_to_resolve(entity.features)
 
-    def run_script(self, script):
-        self.__resolve__(script)
+    def run_script(self, script) -> list[Issue]:
+        issues = []
+        self.__resolve__(script, issues)
         symbol_table = {}
         for s in script.statements:
-            self.execute_statement(s, symbol_table)
+            self.execute_statement(s, symbol_table, issues)
+        return issues
 
     def evaluate_expression(self, expression, symbol_table) -> Any:
         if isinstance(expression, ReferenceExpression):
@@ -187,8 +195,11 @@ class Interpreter:
         else:
             raise Exception("Unable to evaluate expression %s" % str(expression))
 
-    def execute_statement(self, statement, symbol_table):
+    def execute_statement(self, statement, symbol_table, issues: list[Issue]):
         if isinstance(statement, CreateStatement):
+            if statement.entity.referred is None:
+                issues.append(Issue(type=IssueType.SEMANTIC, message="Cannot instantiate entity named %s" % statement.entity.name))
+                return
             instance = self.instantiate_entity(statement.entity.referred)
             if statement.name is not None:
                 symbol_table[statement] = instance
