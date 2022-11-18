@@ -16,6 +16,12 @@ class EntityInstance:
     entity: Entity
     values: dict
 
+    def __str__(self) -> str:
+        for k in self.values.keys():
+            if k.name == 'name':
+                return str(self.values[k])
+        return super().__str__()
+
     def __getitem__(self, name: str) -> Any:
         for k in self.values.keys():
             if k.name == name:
@@ -60,11 +66,10 @@ class Interpreter:
     def __init__(self, module: Module):
         self.module = module
         self.instances_by_entity = {}
-        self.logs = ['Interpreter initialized']
+        self.output = ['Interpreter initialized']
         self.next_id = 1
-        self.output = []
 
-    def __instantiate_entity__(self, entity: Entity) -> None:
+    def instantiate_entity(self, entity: Entity) -> None:
         new_instance = EntityInstance()
         new_instance.id = self.next_id
         self.next_id = self.next_id + 1
@@ -87,7 +92,7 @@ class Interpreter:
         if entity not in self.instances_by_entity:
             self.instances_by_entity[entity] = []
         self.instances_by_entity[entity].append(new_instance)
-        self.logs.append("Added instance of %s: %s" % (entity, new_instance))
+        self.output.append("Added instance of %s: %s" % (entity, new_instance))
         return new_instance
 
     def set_value(self, entity: Entity, feature_name: str, value: Any) -> None:
@@ -174,8 +179,11 @@ class Interpreter:
             right = self.evaluate_expression(expression.right, symbol_table)
             return str(left)+str(right)
         elif isinstance(expression, GetInstanceExpression):
-            index = self.evaluate_expression(expression.id, symbol_table)
-            return self.instances_by_entity[expression.entity.referred][index - 1]
+            id = self.evaluate_expression(expression.id, symbol_table)
+            matching = [i for i in self.instances_by_entity[expression.entity.referred] if i.id == id]
+            if len(matching) != 1:
+                raise Exception()
+            return matching[0]
         elif isinstance(expression, GetFeatureValueExpression):
             instance = self.evaluate_expression(expression.instance, symbol_table)
             return instance.values[expression.feature.referred]
@@ -184,7 +192,7 @@ class Interpreter:
 
     def execute_statement(self, statement, symbol_table):
         if isinstance(statement, CreateStatement):
-            instance = self.__instantiate_entity__(statement.entity.referred)
+            instance = self.instantiate_entity(statement.entity.referred)
             if statement.name is not None:
                 symbol_table[statement] = instance
         elif isinstance(statement, SetStatement):
@@ -196,3 +204,6 @@ class Interpreter:
             self.output.append(message)
         else:
             raise Exception("Unable to execute statement %s" % str(statement))
+
+    def clear_logs(self):
+        self.output = []

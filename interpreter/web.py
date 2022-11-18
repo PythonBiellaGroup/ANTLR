@@ -42,6 +42,14 @@ def create_app():
         # redirect
         return redirect("/entity/%s" % entity_name)
 
+    @app.route('/clearLogs', methods = ['POST'])
+    def clear_logs():
+        print('clear logs')
+        interpreter.clear_logs()
+        answer = {}
+        answer['ok'] = True
+        return json.dumps(answer)
+
     @app.route('/run', methods = ['POST'])
     def run_script():
         print("request %s" % str(request.json))
@@ -60,7 +68,7 @@ def create_app():
                                module_name=module.name,
                                entities=module.entities,
                                entity=module.get_entity_by_name(entity_name),
-                               instance=interpreter.instances_by_id(entity_name, instance_id), logs=interpreter.logs)
+                               instance=interpreter.instances_by_id(entity_name, instance_id), logs=interpreter.output)
 
     @app.route('/entity/<string:entity_name>/')
     def entity_page(entity_name):
@@ -68,7 +76,7 @@ def create_app():
                                module_name=module.name,
                                entities=module.entities,
                                entity=module.get_entity_by_name(entity_name),
-                               instances=interpreter.instances_by_entity_name(entity_name), logs=interpreter.logs)
+                               instances=interpreter.instances_by_entity_name(entity_name), logs=interpreter.output)
 
     @app.route('/')
     def index_page():
@@ -80,6 +88,6 @@ def create_app():
                 nb_of_entities[e.name] = len(interpreter.instances_by_entity[e])
         return render_template('index.html',
                                module_name=module.name,
-                               entities=module.entities, nb_of_entities=nb_of_entities, logs=interpreter.logs)
+                               entities=module.entities, nb_of_entities=nb_of_entities, logs=interpreter.output)
 
     return app

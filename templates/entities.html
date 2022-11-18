@@ -9,6 +9,7 @@
             <table>
                 <thead>
                 <tr>
+                    <td><b>ID</b></td>
                     {% for f in entity.features %}
                         <td><b>{{f.name}}</b></td>
                     {% endfor %}
@@ -17,6 +18,7 @@
                 </thead>
                 {% for i in instances %}
                     <tr>
+                        <td>#{{i.id}}</td>
                         {% for f in entity.features %}
                             <td><i>{{i.values[f]}}</i>                             </td>
                         {% endfor %}

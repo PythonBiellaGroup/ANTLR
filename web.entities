@@ -1,15 +1,16 @@
 module Entities {
 
     entity Client {
-
+        name: string;
     }
 
     entity Project {
-
+        name: string;
+        client: Client;
     }
 
     entity Invoice {
-
+        amount: integer;
     }
 
 }

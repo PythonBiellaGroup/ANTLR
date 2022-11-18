@@ -22,6 +22,19 @@
 })
 .then(response => response.json())
 .then(response => console.log(JSON.stringify(response)))
+.then(response => location.reload())
+      }
+
+      function clearLogs() {
+         const code = document.getElementById('entities-script').value;
+        fetch('/clearLogs', {
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+})
+.then(response => location.reload())
       }
 
     </script>
@@ -30,20 +43,21 @@
   <body>
     {% include 'navigation.html' %}
     {% block content %}{% endblock %}
-    <div>
+    <div class="script-panel">
       <h2>Script</h2>
-      <textarea id="entities-script" name="entities-script" rows="5" cols="50">
+      <textarea id="entities-script" name="entities-script">
       </textarea>
       <br/>
       <a class="run-button" onclick="runScript()">Run</a>
     </div>
-    <div>
+    <div class="logs-panel">
       <h2>Logs</h2>
       <ul>
         {% for msg in logs %}
           <li>{{msg}}</li>
         {% endfor %}
       </ul>
+      <a class="clear-button" onclick="clearLogs()">Clear logs</a>
     </div>
   </body>
 
