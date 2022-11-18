@@ -4,6 +4,7 @@ from enum import Enum
 from pylasu.model import Node
 from pylasu.model.naming import ReferenceByName
 
+
 @dataclass
 class Module(Node):
     name: str = field(default=None)
@@ -55,21 +56,26 @@ class Feature(Node):
     def __hash__(self) -> int:
         return self.name.__hash__()
 
+
 @dataclass
 class Type(Node):
     pass
+
 
 @dataclass
 class StringType(Type):
     pass
 
+
 @dataclass
 class IntegerType(Type):
     pass
 
+
 @dataclass
 class BooleanType(Type):
     pass
+
 
 @dataclass
 class EntityRefType(Type):

@@ -128,9 +128,6 @@ class Interpreter:
             s.entity.try_to_resolve(self.module.entities)
         for e in script.walk_descendants(restrict_to=ReferenceExpression):
             e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
-        # for e in script.walk_descendants(restrict_to=GetInstanceExpression):
-        #     e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
-        #     e.entity_type = e.what.referred.entity.referred
         for s in script.walk_descendants(restrict_to=SetStatement):
             if s.instance is None:
                 raise Exception("We did not expected s.instance to be null for %s" % str(s.instance))
