@@ -5,7 +5,6 @@ from pylasu.model import Node
 
 from interpreter.entities_parser.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, \
     EntityRefType, Type
-from interpreter.controller import Controller
 from interpreter.script_parser.script_ast import CreateStatement, Script, SetStatement, ReferenceExpression, \
     StringLiteralExpression, \
     PrintStatement, GetInstanceExpression, IntLiteralExpression, DivisionExpression, SumExpression, ConcatExpression, \
@@ -58,7 +57,7 @@ class Interpreter:
     instances_by_entity: dict
     output: List[str]
 
-    def __init__(self, module: Module, controller: Controller):
+    def __init__(self, module: Module):
         self.module = module
         self.instances_by_entity = {}
         self.logs = ['Interpreter initialized']

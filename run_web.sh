@@ -1,0 +1,1 @@
+ flask --app interpreter.web --debug run

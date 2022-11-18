@@ -1,0 +1,15 @@
+module Entities {
+
+    entity Client {
+
+    }
+
+    entity Project {
+
+    }
+
+    entity Invoice {
+
+    }
+
+}
