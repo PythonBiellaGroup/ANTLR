@@ -52,14 +52,13 @@
     {% block content %}{% endblock %}
     <div class="script-panel">
       <h2>Script</h2>
-      <textarea id="entities-script" name="entities-script">
-      </textarea>
+      <textarea id="entities-script" name="entities-script"></textarea>
       <br/>
       <a class="run-button" onclick="runScript()">Run</a>
     </div>
     <div class="logs-panel">
       <h2>Logs</h2>
-      <ul>
+      <ul class="logs">
         {% for msg in logs %}
           <li>{{msg}}</li>
         {% endfor %}

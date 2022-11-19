@@ -1,8 +1,32 @@
 .add-button, .run-button, .clear-button {
-    margin: 40px 0px;
+    margin: 10px 20px;
     background-color: darkgreen;
     color: white;
-    padding: 5px;
+    padding: 10px;
+    min-width: 140px;
+    /*height: 45px;*/
+    display: inline-block;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 11pt;
+    /*text-transform: uppercase;*/
+    letter-spacing: 2.5px;
+    font-weight: 500;
+    /*color: #000;*/
+    /*background-color: #fff;*/
+    border: none;
+    border-radius: 45px;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease 0s;
+    cursor: pointer;
+    outline: none;
+}
+
+.add-button:hover, .run-button:hover, .clear-button:hover {
+  background-color: #2EE59D;
+  box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
 }
 
 table {
@@ -114,4 +138,24 @@ td {
     overflow: auto;
     /* Resize creates a tab in the lower right corner of textarea for most modern browsers and allows users to resize the box manually. Note: Resize isn't supported by most older agents and IE. */
     resize: both;
+}
+
+ul.logs  {
+list-style-type: none;
+}
+
+.logs li {
+    background-color: #444;
+    color: white;
+    padding: 5px;
+    text-decoration: none;
+    margin: 0;
+    padding: 5px;
+    /* font-style: italic; */
+    font-family: monospace;
+    color: lightgreen;
+    line-style-type: none;
+    /* display: block;*/
+    border: 1px black solid;
+    margin: 1px;
 }

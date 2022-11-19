@@ -227,9 +227,17 @@ class Interpreter:
             return str(left)+str(right)
         elif isinstance(expression, GetInstanceExpression):
             id = self.evaluate_expression(expression.id, symbol_table, issues)
-            matching = [i for i in self.instances_by_entity[expression.entity.referred] if i.id == id]
+            if expression.entity.referred not in self.instances_by_entity:
+                issues.append(Issue(type=IssueType.SEMANTIC,
+                                    message="Unable to find instance of %s with id %s" % (
+                                    expression.entity.name, str(id))))
+                return None
+            instances = self.instances_by_entity[expression.entity.referred]
+            matching = [i for i in instances if i.id == id]
             if len(matching) != 1:
-                raise Exception("Expected one match but found %s" % str(len(matching)))
+                issues.append(Issue(type=IssueType.SEMANTIC,
+                                    message="Unable to find instance of %s with id %s" % (expression.entity.name, str(id))))
+                return None
             return matching[0]
         elif isinstance(expression, GetFeatureValueExpression):
             instance = self.evaluate_expression(expression.instance, symbol_table, issues)
@@ -260,7 +268,8 @@ class Interpreter:
             instance.set_feature(statement.feature.referred, value)
         elif isinstance(statement, PrintStatement):
             message = self.evaluate_expression(statement.message, symbol_table, issues)
-            self.output.append(message)
+            if message is not None:
+                self.output.append(str(message))
         else:
             raise Exception("Unable to execute statement %s" % str(statement))
 
