@@ -21,7 +21,7 @@ class EntityInstance:
         for k in self.values.keys():
             if k.name == 'name':
                 return str(self.values[k])
-        return super().__str__()
+        return "%s(id=%s,value=%s)" % (self.entity.name, str(self.id), str(self.values))
 
     def __getitem__(self, name: str) -> Any:
         for k in self.values.keys():
