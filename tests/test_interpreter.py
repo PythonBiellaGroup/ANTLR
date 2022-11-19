@@ -122,11 +122,13 @@ class InterpreterTest(unittest.TestCase):
         set name of c to 'ACME Inc.'
         create Project as p
         set name of p to 'Amazing Project'
+        set client of p to c
         print concat (concat 'Working on ' and name of p) and (concat ' for ' and name of client of p)  
         '''
         self.assertEqual([], interpreter.output)
         result = ScriptPylasuParser().parse(script_code)
         self.assertEqual([], result.issues)
-        interpreter.run_script(result.root)
-        self.assertEqual(["Value of Product #2 is: 850"], interpreter.output)
+        issues = interpreter.run_script(result.root)
+        self.assertEqual([], issues)
+        self.assertEqual(["Working on Amazing Project for ACME Inc."], interpreter.output)
 

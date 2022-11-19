@@ -3,6 +3,7 @@ import unittest
 from pylasu.model.naming import ReferenceByName
 from pylasu.validation.validation import Result
 
+from interpreter.entities_parser.entities_ast import EntityRefType
 from interpreter.script_parser.script_ast import Script, SetStatement, CreateStatement, PrintStatement, StringLiteralExpression, \
     IntLiteralExpression, SumExpression, DivisionExpression, GetFeatureValueExpression, ConcatExpression, \
     ReferenceExpression
@@ -47,3 +48,17 @@ class ScriptParserTest(unittest.TestCase):
                 )
             )]
         )), result)
+
+    def test_pylasu_children(self):
+        code = '''
+        create Client as c
+        set name of c to 'ACME Inc.'
+        create Project as p
+        set name of p to 'Amazing Project'
+        print concat (concat 'Working on ' and name of p) and (concat ' for ' and name of client of p)  
+        '''
+        result = ScriptPylasuParser().parse(code)
+        self.assertEqual(0, len(result.issues))
+        self.assertEqual(5, len(list(result.root.children)))
+        self.assertEqual(0, len(list(result.root.walk_descendants(restrict_to=EntityRefType))))
+        self.assertEqual(3, len(list(result.root.walk_descendants(restrict_to=ConcatExpression))))

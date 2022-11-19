@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 from pylasu.model import Node
-from pylasu.model.naming import ReferenceByName
+from pylasu.model.naming import ReferenceByName, Named
 
 
 @dataclass
@@ -33,29 +33,26 @@ class Entity(Node):
         return self.name.__hash__()
 
     def add_str_feature(self, name) -> Feature:
-        f = Feature()
-        f.name = name
+        f = Feature(name)
         f.type = StringType()
         self.features.append(f)
         return f
 
     def add_int_feature(self, name) -> Feature:
-        f = Feature()
-        f.name = name
+        f = Feature(name)
         f.type = IntegerType()
         self.features.append(f)
         return f
 
     def add_entity_feature(self, name: str, entity_name: str) -> Feature:
-        f = Feature()
-        f.name = name
+        f = Feature(name)
         f.type = EntityRefType(entity=ReferenceByName(entity_name))
         self.features.append(f)
         return f
 
 
 @dataclass
-class Feature(Node):
+class Feature(Node, Named):
     name: str = field(default=None)
     type: Type = field(default=None)
     many: bool = field(default=False)
