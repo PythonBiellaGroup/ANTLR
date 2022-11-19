@@ -23,6 +23,8 @@ class InterpreterTest(unittest.TestCase):
         product = m.add_entity('Product')
         product.add_int_feature('value')
         project = m.add_entity('Project')
+        project.add_str_feature('name')
+        project.add_entity_feature('client', 'Client')
         return m
 
     def test_creation(self):
@@ -111,4 +113,20 @@ class InterpreterTest(unittest.TestCase):
         interpreter.run_script(result.root)
         self.assertEqual(["Value of Product #2 is: 850"], interpreter.output)
 
+    def test_annidated_get(self):
+        module = self.simple_module()
+        interpreter = Interpreter(module, verbose=False)
+
+        script_code = '''
+        create Client as c
+        set name of c to 'ACME Inc.'
+        create Project as p
+        set name of p to 'Amazing Project'
+        print concat (concat 'Working on ' and name of p) and (concat ' for ' and name of client of p)  
+        '''
+        self.assertEqual([], interpreter.output)
+        result = ScriptPylasuParser().parse(script_code)
+        self.assertEqual([], result.issues)
+        interpreter.run_script(result.root)
+        self.assertEqual(["Value of Product #2 is: 850"], interpreter.output)
 

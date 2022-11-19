@@ -127,6 +127,12 @@ class Interpreter:
             return REntityRefType(node.what.referred.entity.referred)
         elif isinstance(node, GetInstanceExpression):
             return REntityRefType(node.entity.referred)
+        elif isinstance(node, GetFeatureValueExpression):
+            instance_type = self.__calc_type__(script, node.instance)
+            if not isinstance(instance_type, REntityRefType):
+
+                return null
+            return REntityRefType(node.entity.referred)
         else:
             raise Exception("Unable to calculate type for %s" % (str(node)))
 

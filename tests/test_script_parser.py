@@ -11,7 +11,7 @@ from interpreter.script_parser.script_pylasu_parser import ScriptPylasuParser
 
 class ScriptParserTest(unittest.TestCase):
 
-    def test_pylasu_parse_script(self):
+    def test_pylasu_parse_advanced_script(self):
         code = '''
         create Client as c
         set name of c to 'ACME Inc.'

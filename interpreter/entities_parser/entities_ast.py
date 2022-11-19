@@ -46,6 +46,13 @@ class Entity(Node):
         self.features.append(f)
         return f
 
+    def add_entity_feature(self, name: str, entity_name: str) -> Feature:
+        f = Feature()
+        f.name = name
+        f.type = EntityRefType(entity=ReferenceByName(entity_name))
+        self.features.append(f)
+        return f
+
 
 @dataclass
 class Feature(Node):
