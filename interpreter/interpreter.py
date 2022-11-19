@@ -142,11 +142,14 @@ class Interpreter:
         elif isinstance(node, GetFeatureValueExpression):
             instance_type = self.__calc_type__(script, node.instance, issues)
             if not isinstance(instance_type, REntityRefType):
-                issues.append(Issue(type=IssueType.SEMANTIC, message="Instance has not entity type but type %s" % str(instance_type)))
+                issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=node.position,
+                                    message="Instance has not entity type but type %s" % str(instance_type)))
                 return None
             resolved = node.feature.try_to_resolve(instance_type.entity.features)
             if not resolved:
                 issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=node.position,
                                     message="Feature %s not found in entity %s" % (node.feature.name, str(instance_type.entity))))
                 return None
             return self.__to_runtime_type__(node.feature.referred.type)
@@ -157,19 +160,25 @@ class Interpreter:
         for t in self.module.walk_descendants(restrict_to=EntityRefType):
             resolved = t.entity.try_to_resolve(self.module.entities)
             if not resolved:
-                issues.append(Issue(type=IssueType.SEMANTIC, message="Cannot find entity named %s" % t.entity.name))
+                issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=t.position,
+                                    message="Cannot find entity named %s" % t.entity.name))
 
     def __resolve_script__(self, script: Script, issues: list[Issue]):
         for t in script.walk_descendants(restrict_to=EntityRefType):
             resolved = t.entity.try_to_resolve(self.module.entities)
             if not resolved:
-                issues.append(Issue(type=IssueType.SEMANTIC, message="Cannot find entity named %s" % t.entity.name))
+                issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=t.position,
+                                    message="Cannot find entity named %s" % t.entity.name))
         for s in script.walk_descendants(restrict_to=GetInstanceExpression):
             s.entity.try_to_resolve(self.module.entities)
         for s in script.walk_descendants(restrict_to=CreateStatement):
             resolved = s.entity.try_to_resolve(self.module.entities)
             if not resolved:
-                issues.append(Issue(type=IssueType.SEMANTIC, message="Cannot find entity named %s" % s.entity.name))
+                issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=s.position,
+                                    message="Cannot find entity named %s" % s.entity.name))
         for e in script.walk_descendants(restrict_to=ReferenceExpression):
             e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
         for s in script.walk_descendants(restrict_to=SetStatement):
@@ -229,6 +238,7 @@ class Interpreter:
             id = self.evaluate_expression(expression.id, symbol_table, issues)
             if expression.entity.referred not in self.instances_by_entity:
                 issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=expression.position,
                                     message="Unable to find instance of %s with id %s" % (
                                     expression.entity.name, str(id))))
                 return None
@@ -236,6 +246,7 @@ class Interpreter:
             matching = [i for i in instances if i.id == id]
             if len(matching) != 1:
                 issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=expression.position,
                                     message="Unable to find instance of %s with id %s" % (expression.entity.name, str(id))))
                 return None
             return matching[0]
@@ -243,11 +254,13 @@ class Interpreter:
             instance = self.evaluate_expression(expression.instance, symbol_table, issues)
             if instance is None:
                 issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=expression.position,
                                     message="Cannot evaluate access to feature %s as the instance cannot be calculated" % expression.feature.name))
                 return None
             value = instance.values[expression.feature.referred]
             if value is None:
                 issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=expression.position,
                                     message="Feature %s not found in %s" % (expression.feature.name, str(instance))))
                 return None
             return value
@@ -257,7 +270,9 @@ class Interpreter:
     def execute_statement(self, statement, symbol_table, issues: list[Issue]):
         if isinstance(statement, CreateStatement):
             if statement.entity.referred is None:
-                issues.append(Issue(type=IssueType.SEMANTIC, message="Cannot instantiate entity named %s" % statement.entity.name))
+                issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=statement.position,
+                                    message="Cannot instantiate entity named %s" % statement.entity.name))
                 return
             instance = self.instantiate_entity(statement.entity.referred)
             if statement.name is not None:
