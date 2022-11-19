@@ -14,6 +14,14 @@ from interpreter.script_parser.script_pylasu_parser import ScriptPylasuParser
 
 class ScriptParserTest(unittest.TestCase):
 
+    def test_pylasu_parse_simple_script(self):
+        code = '''create Client as c'''
+        result = ScriptPylasuParser().parse(code)
+        print(str(result.issues))
+        self.assertEqual(0, len(result.issues))
+        self.assertEqual(Result(issues=[], root=Script(statements=[
+            CreateStatement(entity=ReferenceByName(name='Client'), name='c')])), result)
+
     def test_pylasu_parse_advanced_script(self):
         code = '''
         create Client as c
