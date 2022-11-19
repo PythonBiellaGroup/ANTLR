@@ -197,7 +197,7 @@ class Interpreter:
                 raise Exception("Unable to resolve feature reference in %s. Candidates: %s" % (str(s), str(entity.features)))
         for s in script.walk_descendants(restrict_to=GetFeatureValueExpression):
             e = self.__calc_type__(script, s.instance, issues).entity
-            s.feature.try_to_resolve(entity.features)
+            s.feature.try_to_resolve(e.features)
 
     def run_script(self, script) -> list[Issue]:
         issues = []
@@ -269,7 +269,7 @@ class Interpreter:
 
     def execute_statement(self, statement, symbol_table, issues: list[Issue]):
         if isinstance(statement, CreateStatement):
-            if statement.entity.referred is None:
+            if not statement.entity.resolved():
                 issues.append(Issue(type=IssueType.SEMANTIC,
                                     position=statement.position,
                                     message="Cannot instantiate entity named %s" % statement.entity.name))

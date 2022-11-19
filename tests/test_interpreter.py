@@ -17,14 +17,18 @@ class InterpreterTest(unittest.TestCase):
 
     def simple_module(self) -> Module:
         m = Module()
+
         client = m.add_entity('Client')
         client.add_str_feature('name')
         client.add_str_feature('address')
+
         product = m.add_entity('Product')
         product.add_int_feature('value')
+
         project = m.add_entity('Project')
         project.add_str_feature('name')
         project.add_entity_feature('client', 'Client')
+
         return m
 
     def test_creation(self):

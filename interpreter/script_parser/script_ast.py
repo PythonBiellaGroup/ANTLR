@@ -38,7 +38,8 @@ class PrintStatement(Statement):
 @dataclass
 class CreateStatement(Statement):
     """
-    For example, create Project
+    For example, create Project       # name=None
+             or, create Project as c  # name=c
     """
     entity: ReferenceByName = field(default=None)
     name: str = field(default=None)

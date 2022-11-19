@@ -2,7 +2,7 @@ import unittest
 
 from pylasu.model import Position, Point
 from pylasu.model.naming import ReferenceByName
-from pylasu.validation.validation import Result
+from pylasu.validation.validation import Result, IssueType, IssueSeverity
 
 from interpreter.entities_parser.entities_ast import EntityRefType
 from interpreter.script_parser.script_ast import Script, SetStatement, CreateStatement, PrintStatement, \
@@ -17,10 +17,18 @@ class ScriptParserTest(unittest.TestCase):
     def test_pylasu_parse_simple_script(self):
         code = '''create Client as c'''
         result = ScriptPylasuParser().parse(code)
-        print(str(result.issues))
         self.assertEqual(0, len(result.issues))
         self.assertEqual(Result(issues=[], root=Script(statements=[
             CreateStatement(entity=ReferenceByName(name='Client'), name='c')])), result)
+
+    def test_pylasu_parse_error(self):
+        code = '''unknown statement'''
+        result = ScriptPylasuParser().parse(code)
+        self.assertEqual(1, len(result.issues))
+        issue = result.issues[0]
+        self.assertEqual(IssueType.SYNTACTIC, issue.type)
+        self.assertEqual(IssueSeverity.ERROR, issue.severity)
+        self.assertEqual(Point(line=1, column=0), issue.position.start)
 
     def test_pylasu_parse_advanced_script(self):
         code = '''

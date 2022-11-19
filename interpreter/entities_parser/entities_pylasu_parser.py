@@ -25,4 +25,7 @@ class EntitiesPylasuParser:
         parser.addErrorListener(MyListener(issues, IssueType.SYNTACTIC))
         parse_tree = parser.module()
 
-        return Result(root=parse_tree.to_ast(issues), issues=issues)
+        ast = parse_tree.to_ast(issues)
+        ast.assign_parents()
+
+        return Result(root=ast, issues=issues)

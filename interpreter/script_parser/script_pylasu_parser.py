@@ -21,7 +21,8 @@ class MyListener(ErrorListener):
 
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         self.issues.append(Issue(message=str(msg),
-                                 type=self.issue_type, position=Position(start=Point(line=line, column=column), end=Point(line=line, column=column))))
+                                 type=self.issue_type, position=Position(start=Point(line=line, column=column),
+                                                                         end=Point(line=line, column=column))))
 
     def reportAmbiguity(self, recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs):
         pass
@@ -50,4 +51,7 @@ class ScriptPylasuParser:
         parser.addErrorListener(MyListener(issues, IssueType.SYNTACTIC))
         parse_tree = parser.script()
 
-        return Result(root=parse_tree.to_ast(issues), issues=issues)
+        ast = parse_tree.to_ast(issues)
+        ast.assign_parents()
+
+        return Result(root=ast, issues=issues)
