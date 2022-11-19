@@ -1,10 +1,12 @@
 import unittest
 
+from pylasu.model import Position, Point
 from pylasu.model.naming import ReferenceByName
 from pylasu.validation.validation import Result
 
 from interpreter.entities_parser.entities_ast import EntityRefType
-from interpreter.script_parser.script_ast import Script, SetStatement, CreateStatement, PrintStatement, StringLiteralExpression, \
+from interpreter.script_parser.script_ast import Script, SetStatement, CreateStatement, PrintStatement, \
+    StringLiteralExpression, \
     IntLiteralExpression, SumExpression, DivisionExpression, GetFeatureValueExpression, ConcatExpression, \
     ReferenceExpression
 from interpreter.script_parser.script_pylasu_parser import ScriptPylasuParser
@@ -62,3 +64,15 @@ class ScriptParserTest(unittest.TestCase):
         self.assertEqual(5, len(list(result.root.children)))
         self.assertEqual(0, len(list(result.root.walk_descendants(restrict_to=EntityRefType))))
         self.assertEqual(3, len(list(result.root.walk_descendants(restrict_to=ConcatExpression))))
+
+    def test_position(self):
+        code = '''create Client as c
+        set name of c to 'ACME Inc.'
+        create Project as p
+        set name of p to 'Amazing Project'
+        print concat (concat 'Working on ' and name of p) and (concat ' for ' and name of client of p)'''
+        result = ScriptPylasuParser().parse(code)
+        self.assertEqual(0, len(result.issues))
+        self.assertEqual(Position(Point(line=1, column=0), Point(line=5, column=102)), result.root.position)
+        self.assertEqual(Position(Point(line=1, column=0), Point(line=1, column=18)),
+                         list(result.root.children)[0].position)
