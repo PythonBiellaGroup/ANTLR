@@ -5,7 +5,7 @@ from pylasu.model import Node
 from pylasu.validation import Issue, IssueType
 
 from interpreter.entities_parser.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, \
-    EntityRefType, Type
+    EntityRefType, Type, Feature
 from interpreter.script_parser.script_ast import CreateStatement, Script, SetStatement, ReferenceExpression, \
     StringLiteralExpression, \
     PrintStatement, GetInstanceExpression, IntLiteralExpression, DivisionExpression, SumExpression, ConcatExpression, \
@@ -35,22 +35,33 @@ class EntityInstance:
 
 @dataclass
 class RType(Node):
-    pass
+    def can_be_assigned(self, other_type: 'RType') -> bool:
+        return self == other_type
+
+    @classmethod
+    def from_type(cls, type):
+        if isinstance(type, StringType):
+            return RStringType()
+        raise Exception("%s is not supported" % str(type))
+
 
 @dataclass
-class RStringType(Type):
+class RStringType(RType):
     pass
 
-@dataclass
-class RIntegerType(Type):
-    pass
 
 @dataclass
-class RBooleanType(Type):
+class RIntegerType(RType):
     pass
 
+
 @dataclass
-class REntityRefType(Type):
+class RBooleanType(RType):
+    pass
+
+
+@dataclass
+class REntityRefType(RType):
     entity: Entity
 
     def __init__(self, entity: Entity):
@@ -150,9 +161,16 @@ class Interpreter:
             if not resolved:
                 issues.append(Issue(type=IssueType.SEMANTIC,
                                     position=node.position,
-                                    message="Feature %s not found in entity %s" % (node.feature.name, str(instance_type.entity))))
+                                    message="Feature %s not found in entity %s" % (
+                                    node.feature.name, str(instance_type.entity))))
                 return None
             return self.__to_runtime_type__(node.feature.referred.type)
+        elif isinstance(node, Feature):
+            return RType.from_type(node.type)
+        elif isinstance(node, StringLiteralExpression):
+            return RStringType()
+        elif isinstance(node, IntLiteralExpression):
+            return RIntegerType()
         else:
             raise Exception("Unable to calculate type for %s" % (str(node)))
 
@@ -194,7 +212,18 @@ class Interpreter:
             entity = t.entity
             s.feature.try_to_resolve(entity.features)
             if not s.feature.resolved():
-                raise Exception("Unable to resolve feature reference in %s. Candidates: %s" % (str(s), str(entity.features)))
+                issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=s.position,
+                                    message="Unable to resolve feature reference in %s. Candidates: %s" % (
+                                    str(s), str(entity.features))))
+                return
+            feature_type = self.__calc_type__(script, s.feature.referred, issues)
+            value_type = self.__calc_type__(script, s.value, issues)
+            if not feature_type.can_be_assigned(value_type):
+                issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=s.position,
+                                    message="Cannot assign %s (type %s) to feature %s (type %s)"
+                                            % (str(s.value), str(value_type), str(s.feature.referred), str(feature_type))))
         for s in script.walk_descendants(restrict_to=GetFeatureValueExpression):
             e = self.__calc_type__(script, s.instance, issues).entity
             s.feature.try_to_resolve(e.features)
@@ -212,7 +241,8 @@ class Interpreter:
             if expression.what.referred is None:
                 raise Exception("Unresolved expression %s" % str(expression))
             if expression.what.referred not in symbol_table:
-                raise Exception("I cannot find %s in symbol table %s" % (str(expression.what.referred), str(symbol_table)))
+                raise Exception(
+                    "I cannot find %s in symbol table %s" % (str(expression.what.referred), str(symbol_table)))
             return symbol_table[expression.what.referred]
         elif isinstance(expression, StringLiteralExpression):
             return expression.value
@@ -221,33 +251,34 @@ class Interpreter:
         elif isinstance(expression, DivisionExpression):
             left = self.evaluate_expression(expression.left, symbol_table, issues)
             right = self.evaluate_expression(expression.right, symbol_table, issues)
-            return int(left/right)
+            return int(left / right)
         elif isinstance(expression, MultiplicationExpression):
             left = self.evaluate_expression(expression.left, symbol_table, issues)
             right = self.evaluate_expression(expression.right, symbol_table, issues)
-            return left*right
+            return left * right
         elif isinstance(expression, SumExpression):
             left = self.evaluate_expression(expression.left, symbol_table, issues)
             right = self.evaluate_expression(expression.right, symbol_table, issues)
-            return left+right
+            return left + right
         elif isinstance(expression, ConcatExpression):
             left = self.evaluate_expression(expression.left, symbol_table, issues)
             right = self.evaluate_expression(expression.right, symbol_table, issues)
-            return str(left)+str(right)
+            return str(left) + str(right)
         elif isinstance(expression, GetInstanceExpression):
             id = self.evaluate_expression(expression.id, symbol_table, issues)
             if expression.entity.referred not in self.instances_by_entity:
                 issues.append(Issue(type=IssueType.SEMANTIC,
                                     position=expression.position,
                                     message="Unable to find instance of %s with id %s" % (
-                                    expression.entity.name, str(id))))
+                                        expression.entity.name, str(id))))
                 return None
             instances = self.instances_by_entity[expression.entity.referred]
             matching = [i for i in instances if i.id == id]
             if len(matching) != 1:
                 issues.append(Issue(type=IssueType.SEMANTIC,
                                     position=expression.position,
-                                    message="Unable to find instance of %s with id %s" % (expression.entity.name, str(id))))
+                                    message="Unable to find instance of %s with id %s" % (
+                                    expression.entity.name, str(id))))
                 return None
             return matching[0]
         elif isinstance(expression, GetFeatureValueExpression):

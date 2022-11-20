@@ -7,6 +7,8 @@ from interpreter.interpreter import Interpreter
 from interpreter.script_parser.script_ast import Script, CreateStatement, StringLiteralExpression, \
     ReferenceExpression, SetStatement, PrintStatement
 from interpreter.script_parser.script_pylasu_parser import ScriptPylasuParser
+from pylasu.model import Position, Point
+from pylasu.validation import Issue, IssueType
 
 
 class DummyController(object):
@@ -136,3 +138,26 @@ class InterpreterTest(unittest.TestCase):
         self.assertEqual([], issues)
         self.assertEqual(["Working on Amazing Project for ACME Inc."], interpreter.output)
 
+    def test_set_check_type_compatibility(self):
+        module = self.simple_module()
+        interpreter = Interpreter(module, verbose=False)
+
+        script_code = '''
+        create Client as c
+        set name of c to 'ACME Inc.'
+        '''
+        result = ScriptPylasuParser().parse(script_code)
+        self.assertEqual([], result.issues)
+        issues = interpreter.run_script(result.root)
+        self.assertEqual([], issues)
+
+        script_code = '''
+        create Client as c
+        set name of c to 1
+        '''
+        result = ScriptPylasuParser().parse(script_code)
+        self.assertEqual([], result.issues)
+        issues = interpreter.run_script(result.root)
+        self.assertEqual(1, len(issues))
+        self.assertEqual("Cannot assign IntLiteralExpression(value=1) (type RIntegerType()) to feature "
+                         "Feature(name='name', type=StringType(), many=False) (type RStringType())", issues[0].message)
