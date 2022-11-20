@@ -39,10 +39,16 @@ class RType(Node):
         return self == other_type
 
     @classmethod
-    def from_type(cls, type):
+    def from_type(cls, type: Type):
         if isinstance(type, StringType):
             return RStringType()
-        raise Exception("%s is not supported" % str(type))
+        elif isinstance(type, IntegerType):
+            return RIntegerType()
+        elif isinstance(type, EntityRefType):
+            assert type.entity.resolved()
+            return REntityRefType(type.entity.referred)
+        else:
+            raise Exception("%s is not supported" % str(type))
 
 
 @dataclass
@@ -171,6 +177,8 @@ class Interpreter:
             return RStringType()
         elif isinstance(node, IntLiteralExpression):
             return RIntegerType()
+        elif isinstance(node, DivisionExpression):
+            return RIntegerType()
         else:
             raise Exception("Unable to calculate type for %s" % (str(node)))
 
@@ -198,7 +206,11 @@ class Interpreter:
                                     position=s.position,
                                     message="Cannot find entity named %s" % s.entity.name))
         for e in script.walk_descendants(restrict_to=ReferenceExpression):
-            e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
+            resolved = e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
+            if not resolved:
+                issues.append(Issue(type=IssueType.SEMANTIC,
+                                    position=s.position,
+                                    message="Cannot find variable named %s" % e.what.name))
         for s in script.walk_descendants(restrict_to=SetStatement):
             if s.instance is None:
                 raise Exception("We did not expected s.instance to be null for %s" % str(s.instance))

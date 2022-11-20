@@ -54,15 +54,12 @@ def create_app():
 
     @app.route('/run', methods = ['POST'])
     def run_script():
-        print("request %s" % str(request.json))
         script_code = request.json['code']
         result = ScriptPylasuParser().parse(script_code)
         issues = result.issues
         try:
             issues = result.issues + interpreter.run_script(result.root)
-            answer = {}
-            answer['ok'] = len(issues) == 0
-            answer['issues'] = [str(i) for i in issues]
+            answer = {'ok': len(issues) == 0, 'issues': [str(i) for i in issues]}
         except BaseException as ex:
             # Get current system exception
             ex_type, ex_value, ex_traceback = sys.exc_info()
