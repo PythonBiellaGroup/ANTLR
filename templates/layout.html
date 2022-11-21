@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+
+  <head>
+    <title>{{title}}</title>
+    <meta charset="utf-8">
+    <meta name="description" content={{description}}>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    <script>
+      function runScript() {
+         const code = document.getElementById('entities-script').value;
+        fetch('/run', {
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ "code": code })
+})
+.then(response => response.json())
+.then(response => {
+  console.log(JSON.stringify(response));
+  if (response['error'] != null) {
+    alert(response['error']);
+  } else if (!response['ok']) {
+    alert(JSON.stringify(response['issues']));
+  }
+})
+.then(response => location.reload())
+      }
+
+      function clearLogs() {
+         const code = document.getElementById('entities-script').value;
+        fetch('/clearLogs', {
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+})
+.then(response => location.reload())
+      }
+
+    </script>
+  </head>
+
+  <body>
+    {% include 'navigation.html' %}
+    {% block content %}{% endblock %}
+    <div class="script-panel">
+      <h2>Script</h2>
+      <textarea id="entities-script" name="entities-script"></textarea>
+      <br/>
+      <a class="run-button" onclick="runScript()">Run</a>
+    </div>
+    <div class="logs-panel">
+      <h2>Logs</h2>
+      <ul class="logs">
+        {% for msg in logs %}
+          <li>{{msg}}</li>
+        {% endfor %}
+      </ul>
+      <a class="clear-button" onclick="clearLogs()">Clear logs</a>
+    </div>
+  </body>
+
+</html>

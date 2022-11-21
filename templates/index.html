@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1>Top level entities</h1>
+        {%- for entity in entities %}
+             <p><b><a href="/entity/{{entity.name}}">{{ entity.name }}</a>:</b> {{nb_of_entities[entity.name]}} instances</p>
+        {% endfor %}
+    </div>
+{% endblock %}

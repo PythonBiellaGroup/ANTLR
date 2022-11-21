@@ -1,0 +1,7 @@
+<div class="navigation">
+    <h2>Entities Scriptable App</h2>
+    <ul class="navigation-menu">
+        <li><a href="/">Homepage</a></li>
+          {% for entity in entities %}<li><a href="/entity/{{entity.name}}">{{ entity.name }}</a></li>{% endfor %}
+    </ul>
+</div>

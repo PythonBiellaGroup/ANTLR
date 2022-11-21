@@ -92,5 +92,10 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# Idea project settings
+.idea/
+
 # Generated parser
-entity_parser/
+entity_parser
+script_parser
+gen
