@@ -2,13 +2,11 @@ import unittest
 
 from pylasu.model.naming import ReferenceByName
 
-from interpreter.entities_parser.entities_ast import Module, Entity
+from parsers.entities_parser.entities_ast import Module, Entity
 from interpreter.interpreter import Interpreter
-from interpreter.script_parser.script_ast import Script, CreateStatement, StringLiteralExpression, \
+from parsers.script_parser import Script, CreateStatement, StringLiteralExpression, \
     ReferenceExpression, SetStatement, PrintStatement
-from interpreter.script_parser.script_pylasu_parser import ScriptPylasuParser
-from pylasu.model import Position, Point
-from pylasu.validation import Issue, IssueType
+from parsers.script_parser import ScriptPylasuParser
 
 
 class DummyController(object):

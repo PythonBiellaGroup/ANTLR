@@ -5,11 +5,11 @@ from pylasu.parsing.parse_tree import ParseTreeOrigin
 from pylasu.support import extension_method
 from pylasu.validation import Issue
 
-from interpreter.script_parser.script_ast import Script, CreateStatement, ReferenceExpression, StringLiteralExpression, \
+from parsers.script_parser.script_ast import Script, CreateStatement, ReferenceExpression, StringLiteralExpression, \
     SetStatement, DivisionExpression, MultiplicationExpression, SumExpression, SubtractionExpression, Expression, \
     IntLiteralExpression, PrintStatement, ConcatExpression, GetFeatureValueExpression, ErrorExpression, \
     GetInstanceExpression
-from script_parser.AntlrScriptParser import AntlrScriptParser
+from parsers.script_parser.AntlrScriptParser import AntlrScriptParser
 
 
 @extension_method(AntlrScriptParser.ScriptContext)

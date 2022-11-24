@@ -3,10 +3,10 @@ import unittest
 from antlr4 import CommonTokenStream, InputStream
 from pylasu.model.naming import ReferenceByName
 
-from entity_parser.AntlrEntityLexer import AntlrEntityLexer
-from entity_parser.AntlrEntityParser import AntlrEntityParser
-from interpreter.entities_parser.entities_ast import Module, StringType, Entity, Feature, EntityRefType, IntegerType
-from interpreter.entities_parser.entities_pylasu_parser import EntitiesPylasuParser
+from parsers.entities_parser.AntlrEntityLexer import AntlrEntityLexer
+from parsers.entities_parser.AntlrEntityParser import AntlrEntityParser
+from parsers.entities_parser.entities_ast import Module, StringType, Entity, Feature, EntityRefType, IntegerType
+from parsers.entities_parser.entities_pylasu_parser import EntitiesPylasuParser
 
 
 class EntityParserTest(unittest.TestCase):

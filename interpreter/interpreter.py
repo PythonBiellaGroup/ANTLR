@@ -4,9 +4,9 @@ from typing import Any, List, Optional
 from pylasu.model import Node
 from pylasu.validation import Issue, IssueType
 
-from interpreter.entities_parser.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, \
+from parsers.entities_parser.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, \
     EntityRefType, Type, Feature
-from interpreter.script_parser.script_ast import CreateStatement, Script, SetStatement, ReferenceExpression, \
+from parsers.script_parser import CreateStatement, Script, SetStatement, ReferenceExpression, \
     StringLiteralExpression, \
     PrintStatement, GetInstanceExpression, IntLiteralExpression, DivisionExpression, SumExpression, ConcatExpression, \
     GetFeatureValueExpression, MultiplicationExpression
