@@ -27,14 +27,14 @@ class EntityGeneratorTest(unittest.TestCase):
 
 @dataclass
 class Person:
-    name: str
-    address: str
+    name: str = None
+    address: str = None
 
 
 @dataclass
 class Vehicle:
-    license_plate: str
-    year: int
-    owner: "Person"
+    license_plate: str = None
+    year: int = None
+    owner: "Person" = None
 
 ''', module.to_python())

@@ -190,5 +190,3 @@ class Interpreter:
 
     def clear_logs(self):
         self.output = []
-
-
