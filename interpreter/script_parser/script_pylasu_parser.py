@@ -1,3 +1,5 @@
+from typing import List
+
 from antlr4 import InputStream, CommonTokenStream
 from antlr4.error.ErrorListener import ErrorListener
 from pylasu.model import Position, Point
@@ -12,10 +14,10 @@ from script_parser.AntlrScriptParser import AntlrScriptParser
 
 
 class MyListener(ErrorListener):
-    issues: list[Issue]
+    issues: List[Issue]
     issue_type: IssueType
 
-    def __init__(self, issues: list[Issue], issue_type: IssueType):
+    def __init__(self, issues: List[Issue], issue_type: IssueType):
         self.issues = issues
         self.issue_type = issue_type
 
