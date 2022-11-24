@@ -70,10 +70,9 @@ class RBooleanType(RType):
 class REntityRefType(RType):
     entity: Entity
 
-    def __init__(self, entity: Entity):
-        if entity is None:
+    def __post_init__(self):
+        if self.entity is None:
             raise Exception("Unresolved")
-        self.entity = entity
 
 
 class Interpreter:
