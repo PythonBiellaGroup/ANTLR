@@ -41,10 +41,10 @@ class ScriptGeneratorTest(unittest.TestCase):
         self.assertEqual(0, len(issues))
 
         code = cst_module.code
-        globals = {'instances_by_entity': runtime.instances_by_entity, 'add_entity': runtime.add_entity}
-        exec(code, globals)
+        namespace = {'instances_by_entity': runtime.instances_by_entity, 'add_entity': runtime.add_entity}
+        exec(code, namespace)
 
-        self.assertTrue("a_client" in globals)
-        client_class = globals["Client"]
+        self.assertTrue("a_client" in namespace)
+        client_class = namespace["Client"]
         self.assertEqual(1, len(runtime.instances_by_entity))
-        self.assertEqual(runtime.instances_by_entity[client_class][0], globals["a_client"])
+        self.assertEqual(runtime.instances_by_entity[client_class][0], namespace["a_client"])

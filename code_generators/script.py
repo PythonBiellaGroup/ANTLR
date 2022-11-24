@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Optional
 
 import libcst
-from libcst import Comment, EmptyLine
+from libcst import Arg, Comment, EmptyLine, Expr, Name, SimpleStatementLine
 from pylasu.validation import Issue, IssueType
 
 import code_generators.entities
-from parsers.entities_parser import Module
+from parsers.entities_parser import Module, Entity, StringType, BooleanType, IntegerType, EntityRefType
 from parsers.script_parser import CreateStatement, Statement
 from support.resolution import resolve_module, resolve_script
 
@@ -39,11 +39,10 @@ class PythonGenerator:
     def translate_statement(self, statement: Statement, module: libcst.Module, issues: List[Issue]):
         if isinstance(statement, CreateStatement):
             if statement.entity.resolved():
-                code = f"add_entity({statement.entity.referred.name}, {statement.entity.referred.name}())"
-                if statement.name:
-                    code = f"{statement.name} = " + code
-                stmts = libcst.parse_module(code)
-                return module.with_changes(body=module.body + [EmptyLine(), EmptyLine()] + stmts.body, footer=[])
+                entity = statement.entity.referred
+                name = statement.name
+                stmts = self.instantiate_entity(entity, name)
+                return module.with_changes(body=module.body + [EmptyLine(), EmptyLine()] + stmts, footer=[])
             else:
                 message = "Cannot instantiate entity named %s" % statement.entity.name
                 issues.append(Issue(type=IssueType.SEMANTIC,
@@ -52,6 +51,32 @@ class PythonGenerator:
                 return module.with_changes(body=module.body + [EmptyLine(comment=Comment(f"# {message}"))])
         else:
             return module
+
+    def instantiate_entity(self, entity: Entity, name: Optional[str]):
+        code = f"add_entity({entity.name})"
+        expr = libcst.parse_expression(code)
+        for feature in entity.features:
+            if feature.many:
+                feature_value = []
+            elif isinstance(feature.type, StringType):
+                feature_value = "'<unspecified>'"
+            elif isinstance(feature.type, BooleanType):
+                feature_value = "False"
+            elif isinstance(feature.type, IntegerType):
+                feature_value = "0"
+            elif isinstance(feature.type, EntityRefType):
+                feature_value = None
+            else:
+                raise Exception("Unsupported type %s (feature: %s)" % (str(feature.type), str(feature)))
+            if feature_value is not None:
+                expr = expr.with_changes(
+                    args=expr.args + (Arg(keyword=Name(feature.name), value=libcst.parse_expression(feature_value)),))
+        if name:
+            stmt = libcst.parse_statement(f'{name} = e')
+            stmt = stmt.with_deep_changes(stmt.body[0], value=expr)
+        else:
+            stmt = SimpleStatementLine(body=[Expr(value=expr)])
+        return [stmt]
 
     def clear_logs(self):
         self.output = []
