@@ -1,15 +1,14 @@
-from dataclasses import dataclass
 from typing import Any, List, Optional
 
-from pylasu.model import Node
 from pylasu.validation import Issue, IssueType
 
 from parsers.entities_parser.entities_ast import Entity, Module, StringType, BooleanType, IntegerType, \
-    EntityRefType, Type, Feature
-from parsers.script_parser import CreateStatement, Script, SetStatement, ReferenceExpression, \
+    EntityRefType
+from parsers.script_parser import CreateStatement, SetStatement, ReferenceExpression, \
     StringLiteralExpression, \
     PrintStatement, GetInstanceExpression, IntLiteralExpression, DivisionExpression, SumExpression, ConcatExpression, \
     GetFeatureValueExpression, MultiplicationExpression
+from support.resolution import resolve_module, resolve_script
 
 
 class EntityInstance:
@@ -33,48 +32,6 @@ class EntityInstance:
         self.values[feature] = value
 
 
-@dataclass
-class RType(Node):
-    def can_be_assigned(self, other_type: 'RType') -> bool:
-        return self == other_type
-
-    @classmethod
-    def from_type(cls, type: Type):
-        if isinstance(type, StringType):
-            return RStringType()
-        elif isinstance(type, IntegerType):
-            return RIntegerType()
-        elif isinstance(type, EntityRefType):
-            assert type.entity.resolved()
-            return REntityRefType(type.entity.referred)
-        else:
-            raise Exception("%s is not supported" % str(type))
-
-
-@dataclass
-class RStringType(RType):
-    pass
-
-
-@dataclass
-class RIntegerType(RType):
-    pass
-
-
-@dataclass
-class RBooleanType(RType):
-    pass
-
-
-@dataclass
-class REntityRefType(RType):
-    entity: Entity
-
-    def __post_init__(self):
-        if self.entity is None:
-            raise Exception("Unresolved")
-
-
 class Interpreter:
     module: Module
     instances_by_entity: dict
@@ -83,7 +40,7 @@ class Interpreter:
     def __init__(self, module: Module, verbose: bool = True):
         self.module = module
         issues = []
-        self.__resolve_module__(issues)
+        resolve_module(self.module, issues)
         if len(issues) > 0:
             raise Exception("Issues in nodule: %s" % str(issues))
 
@@ -140,108 +97,9 @@ class Interpreter:
             raise Exception("one instance expected")
         return matches[0]
 
-    def __to_runtime_type__(self, type) -> RType:
-        if isinstance(type, EntityRefType):
-            if not type.entity.resolved():
-                raise Exception("Cannot translate unresolved entity reference to %s" % type.entity.name)
-            return REntityRefType(entity=type.entity.referred)
-        raise Exception("unsupported %s" % str(type))
-
-    def __calc_type__(self, script: Script, node: Node, issues: List[Issue]) -> Optional[RType]:
-        if isinstance(node, ReferenceExpression):
-            if not node.what.referred.entity.resolved():
-                self.output.append("Entity cannot be resolved: %s" % str(node.what.referred.entity.name))
-                return None
-            return REntityRefType(node.what.referred.entity.referred)
-        elif isinstance(node, GetInstanceExpression):
-            return REntityRefType(node.entity.referred)
-        elif isinstance(node, GetFeatureValueExpression):
-            instance_type = self.__calc_type__(script, node.instance, issues)
-            if not isinstance(instance_type, REntityRefType):
-                issues.append(Issue(type=IssueType.SEMANTIC,
-                                    position=node.position,
-                                    message="Instance has not entity type but type %s" % str(instance_type)))
-                return None
-            resolved = node.feature.try_to_resolve(instance_type.entity.features)
-            if not resolved:
-                issues.append(Issue(type=IssueType.SEMANTIC,
-                                    position=node.position,
-                                    message="Feature %s not found in entity %s" % (
-                                        node.feature.name, str(instance_type.entity))))
-                return None
-            return self.__to_runtime_type__(node.feature.referred.type)
-        elif isinstance(node, Feature):
-            return RType.from_type(node.type)
-        elif isinstance(node, StringLiteralExpression):
-            return RStringType()
-        elif isinstance(node, IntLiteralExpression):
-            return RIntegerType()
-        elif isinstance(node, DivisionExpression):
-            return RIntegerType()
-        else:
-            raise Exception("Unable to calculate type for %s" % (str(node)))
-
-    def __resolve_module__(self, issues: List[Issue]):
-        for t in self.module.walk_descendants(restrict_to=EntityRefType):
-            resolved = t.entity.try_to_resolve(self.module.entities)
-            if not resolved:
-                issues.append(Issue(type=IssueType.SEMANTIC,
-                                    position=t.position,
-                                    message="Cannot find entity named %s" % t.entity.name))
-
-    def __resolve_script__(self, script: Script, issues: List[Issue]):
-        for t in script.walk_descendants(restrict_to=EntityRefType):
-            resolved = t.entity.try_to_resolve(self.module.entities)
-            if not resolved:
-                issues.append(Issue(type=IssueType.SEMANTIC,
-                                    position=t.position,
-                                    message="Cannot find entity named %s" % t.entity.name))
-        for s in script.walk_descendants(restrict_to=GetInstanceExpression):
-            s.entity.try_to_resolve(self.module.entities)
-        for s in script.walk_descendants(restrict_to=CreateStatement):
-            resolved = s.entity.try_to_resolve(self.module.entities)
-            if not resolved:
-                issues.append(Issue(type=IssueType.SEMANTIC,
-                                    position=s.position,
-                                    message="Cannot find entity named %s" % s.entity.name))
-        for e in script.walk_descendants(restrict_to=ReferenceExpression):
-            resolved = e.what.try_to_resolve(script.walk_descendants(restrict_to=CreateStatement))
-            if not resolved:
-                issues.append(Issue(type=IssueType.SEMANTIC,
-                                    position=s.position,
-                                    message="Cannot find variable named %s" % e.what.name))
-        for s in script.walk_descendants(restrict_to=SetStatement):
-            if s.instance is None:
-                raise Exception("We did not expected s.instance to be null for %s" % str(s.instance))
-            t = self.__calc_type__(script, s.instance, issues)
-            if t is None:
-                raise Exception("We did not expected s.instance to be null for %s" % str(s.instance))
-            if not isinstance(t, REntityRefType):
-                raise Exception("We did not expected type of s.instance to be not an EntityRefType for %s" % str(t))
-            if t.entity is None:
-                raise Exception("We did not expected entity to be null for %s" % str(s))
-            entity = t.entity
-            s.feature.try_to_resolve(entity.features)
-            if not s.feature.resolved():
-                issues.append(Issue(type=IssueType.SEMANTIC,
-                                    position=s.position,
-                                    message="Unable to resolve feature reference in %s. Candidates: %s" % (
-                                        str(s), str(entity.features))))
-                return
-            feature_type = self.__calc_type__(script, s.feature.referred, issues)
-            value_type = self.__calc_type__(script, s.value, issues)
-            if not feature_type.can_be_assigned(value_type):
-                issues.append(Issue(type=IssueType.SEMANTIC,
-                                    position=s.position,
-                                    message="Cannot assign %s (type %s) to feature %s (type %s)"
-                                            % (str(s.value), str(value_type), str(s.feature.referred), str(feature_type))))
-        for s in script.walk_descendants(restrict_to=GetFeatureValueExpression):
-            e = self.__calc_type__(script, s.instance, issues).entity
-            s.feature.try_to_resolve(e.features)
-
     def run_script(self, script) -> List[Issue]:
         issues = []
-        self.__resolve_script__(script, issues)
+        resolve_script(self.module, script, issues)
         symbol_table = {}
         for s in script.statements:
             self.execute_statement(s, symbol_table, issues)
@@ -332,3 +190,5 @@ class Interpreter:
 
     def clear_logs(self):
         self.output = []
+
+

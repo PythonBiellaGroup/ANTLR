@@ -8,7 +8,7 @@ import code_generators.entities
 
 class EntityGeneratorTest(unittest.TestCase):
     def test_empty_module_generator(self):
-        self.assertEqual("", Module().to_python())
+        self.assertEqual("from dataclasses import dataclass\n", Module().to_python())
 
     def test_module_generator(self):
         person = Entity(name='Person',
