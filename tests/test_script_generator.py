@@ -32,6 +32,7 @@ class ScriptGeneratorTest(unittest.TestCase):
 
         script = Script(statements=[
             CreateStatement(
+                name="a_client",
                 entity=ReferenceByName[Entity]("Client")
             )
         ])
@@ -40,6 +41,10 @@ class ScriptGeneratorTest(unittest.TestCase):
         self.assertEqual(0, len(issues))
 
         code = cst_module.code
-        exec(code, {'instances_by_entity': runtime.instances_by_entity, 'add_entity': runtime.add_entity})
+        globals = {'instances_by_entity': runtime.instances_by_entity, 'add_entity': runtime.add_entity}
+        exec(code, globals)
 
+        self.assertTrue("a_client" in globals)
+        client_class = globals["Client"]
         self.assertEqual(1, len(runtime.instances_by_entity))
+        self.assertEqual(runtime.instances_by_entity[client_class][0], globals["a_client"])

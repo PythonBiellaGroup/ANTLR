@@ -30,9 +30,7 @@ class PythonGenerator:
 
     def translate_script(self, script, issues: List[Issue]) -> libcst.Module:
         resolve_script(self.module, script, issues)
-        result = libcst.parse_module(f'''{self.module.to_python()}
-
-''')
+        result = libcst.parse_module(f'''{self.module.to_python()}''')
         for s in script.statements:
             # Nota: i nodi di Libcst sono immutabili
             result = self.translate_statement(s, result, issues)
@@ -45,7 +43,7 @@ class PythonGenerator:
                 if statement.name:
                     code = f"{statement.name} = " + code
                 stmts = libcst.parse_module(code)
-                return module.with_changes(body=module.body + stmts.body)
+                return module.with_changes(body=module.body + [EmptyLine(), EmptyLine()] + stmts.body, footer=[])
             else:
                 message = "Cannot instantiate entity named %s" % statement.entity.name
                 issues.append(Issue(type=IssueType.SEMANTIC,
