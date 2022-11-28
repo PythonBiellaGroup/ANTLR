@@ -1,5 +1,6 @@
 import unittest
 
+import libcst
 from pylasu.model.naming import ReferenceByName
 
 from code_generators import runtime
@@ -37,7 +38,7 @@ class ScriptGeneratorTest(unittest.TestCase):
             )
         ])
         issues = []
-        cst_module = generator.translate_script(script, issues)
+        cst_module: libcst.Module = generator.translate_script(script, issues)
         self.assertEqual(0, len(issues))
 
         code = cst_module.code

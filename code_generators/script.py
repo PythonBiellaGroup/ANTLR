@@ -30,7 +30,8 @@ class PythonGenerator:
 
     def translate_script(self, script, issues: List[Issue]) -> libcst.Module:
         resolve_script(self.module, script, issues)
-        result = libcst.parse_module(f'''{self.module.to_python()}''')
+        entities_setup_code = f'{self.module.to_python()}'
+        result = libcst.parse_module(entities_setup_code)
         for s in script.statements:
             # Nota: i nodi di Libcst sono immutabili
             result = self.translate_statement(s, result, issues)
@@ -45,12 +46,14 @@ class PythonGenerator:
                 return module.with_changes(body=module.body + [EmptyLine(), EmptyLine()] + stmts, footer=[])
             else:
                 message = "Cannot instantiate entity named %s" % statement.entity.name
-                issues.append(Issue(type=IssueType.SEMANTIC,
-                                    position=statement.position,
-                                    message=message))
-                return module.with_changes(body=module.body + [EmptyLine(comment=Comment(f"# {message}"))])
+                return self.report_issue(message, module, statement, issues)
         else:
-            return module
+            message = f"I don't know how to translate a node of type {type(statement).__name__} yet."
+            return self.report_issue(message, module, statement, issues)
+
+    def report_issue(self, message, module, node, issues):
+        issues.append(Issue(type=IssueType.SEMANTIC, position=node.position, message=message))
+        return module.with_changes(body=module.body + [EmptyLine(comment=Comment(f"# {message}"))])
 
     def instantiate_entity(self, entity: Entity, name: Optional[str]):
         code = f"add_entity({entity.name})"
