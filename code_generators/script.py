@@ -42,44 +42,46 @@ class PythonGenerator:
             if statement.entity.resolved():
                 entity = statement.entity.referred
                 name = statement.name
-                stmts = self.instantiate_entity(entity, name)
+                stmts = instantiate_entity(entity, name)
                 return module.with_changes(body=module.body + [EmptyLine(), EmptyLine()] + stmts, footer=[])
             else:
                 message = "Cannot instantiate entity named %s" % statement.entity.name
-                return self.report_issue(message, module, statement, issues)
+                return report_issue(message, module, statement, issues)
         else:
             message = f"I don't know how to translate a node of type {type(statement).__name__} yet."
-            return self.report_issue(message, module, statement, issues)
-
-    def report_issue(self, message, module, node, issues):
-        issues.append(Issue(type=IssueType.SEMANTIC, position=node.position, message=message))
-        return module.with_changes(body=module.body + [EmptyLine(comment=Comment(f"# {message}"))])
-
-    def instantiate_entity(self, entity: Entity, name: Optional[str]):
-        code = f"add_entity({entity.name})"
-        expr = libcst.parse_expression(code)
-        for feature in entity.features:
-            if feature.many:
-                feature_value = []
-            elif isinstance(feature.type, StringType):
-                feature_value = "'<unspecified>'"
-            elif isinstance(feature.type, BooleanType):
-                feature_value = "False"
-            elif isinstance(feature.type, IntegerType):
-                feature_value = "0"
-            elif isinstance(feature.type, EntityRefType):
-                feature_value = None
-            else:
-                raise Exception("Unsupported type %s (feature: %s)" % (str(feature.type), str(feature)))
-            if feature_value is not None:
-                expr = expr.with_changes(
-                    args=expr.args + (Arg(keyword=Name(feature.name), value=libcst.parse_expression(feature_value)),))
-        if name:
-            stmt = libcst.parse_statement(f'{name} = e')
-            stmt = stmt.with_deep_changes(stmt.body[0], value=expr)
-        else:
-            stmt = SimpleStatementLine(body=[Expr(value=expr)])
-        return [stmt]
+            return report_issue(message, module, statement, issues)
 
     def clear_logs(self):
         self.output = []
+
+
+def report_issue(message, module, node, issues):
+    issues.append(Issue(type=IssueType.SEMANTIC, position=node.position, message=message))
+    return module.with_changes(body=module.body + [EmptyLine(comment=Comment(f"# {message}"))])
+
+
+def instantiate_entity(entity: Entity, name: Optional[str]):
+    code = f"add_entity({entity.name})"
+    expr = libcst.parse_expression(code)
+    for feature in entity.features:
+        if feature.many:
+            feature_value = []
+        elif isinstance(feature.type, StringType):
+            feature_value = "'<unspecified>'"
+        elif isinstance(feature.type, BooleanType):
+            feature_value = "False"
+        elif isinstance(feature.type, IntegerType):
+            feature_value = "0"
+        elif isinstance(feature.type, EntityRefType):
+            feature_value = None
+        else:
+            raise Exception("Unsupported type %s (feature: %s)" % (str(feature.type), str(feature)))
+        if feature_value is not None:
+            expr = expr.with_changes(
+                args=expr.args + (Arg(keyword=Name(feature.name), value=libcst.parse_expression(feature_value)),))
+    if name:
+        stmt = libcst.parse_statement(f'{name} = e')
+        stmt = stmt.with_deep_changes(stmt.body[0], value=expr)
+    else:
+        stmt = SimpleStatementLine(body=[Expr(value=expr)])
+    return [stmt]
