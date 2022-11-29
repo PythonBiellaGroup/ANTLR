@@ -65,7 +65,7 @@ def instantiate_entity(entity: Entity, name: Optional[str]):
     expr = libcst.parse_expression(code)
     for feature in entity.features:
         if feature.many:
-            feature_value = []
+            feature_value = "[]"
         elif isinstance(feature.type, StringType):
             feature_value = "'<unspecified>'"
         elif isinstance(feature.type, BooleanType):

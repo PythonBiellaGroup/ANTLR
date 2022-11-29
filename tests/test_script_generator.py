@@ -31,6 +31,7 @@ class ScriptGeneratorTest(unittest.TestCase):
         module = self.simple_module()
         generator = PythonGenerator(module)
 
+        # create Client as a_client
         script = Script(statements=[
             CreateStatement(
                 name="a_client",
