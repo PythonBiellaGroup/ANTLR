@@ -1,6 +1,6 @@
 lexer grammar AntlrScriptLexer;
 
-options { 
+options {
     caseInsensitive=true; //Opzione aggiunta recentemente, ignora il case
 }
 
@@ -40,10 +40,10 @@ CONCAT: 'concat';
 AND: 'and';
 
 // Nomi (o identifier)
-ID: [a-zA-Z][a-zA-Z0-9_]*; // Notare il pattern tipo espressione regolare
+ID: [a-z][a-z0-9_]*; // Notare il pattern tipo espressione regolare
 INT_VALUE: '0'|[1-9][0-9]*;
 STR_VALUE: '\'' ~['\r\n]* '\'';
 
-// I caratteri di spaziatura non ci interessano, 
+// I caratteri di spaziatura non ci interessano,
 // dunque li nascondiamo al parser
 WS: [ \r\n\t]+ -> channel(HIDDEN);

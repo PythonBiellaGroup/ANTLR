@@ -1,11 +1,9 @@
 from antlr4 import InputStream, CommonTokenStream
 from pylasu.validation.validation import Result, IssueType
 
-from entity_parser.AntlrEntityLexer import AntlrEntityLexer
-from entity_parser.AntlrEntityParser import AntlrEntityParser
-from interpreter.script_parser.script_pylasu_parser import MyListener
-
-from interpreter.entities_parser.entities_parsetree_converter import to_ast
+from parsers.entities_parser.AntlrEntityLexer import AntlrEntityLexer
+from parsers.entities_parser.AntlrEntityParser import AntlrEntityParser
+from parsers.script_parser.script_pylasu_parser import MyListener
 
 
 class EntitiesPylasuParser:

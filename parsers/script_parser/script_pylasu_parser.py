@@ -5,12 +5,8 @@ from antlr4.error.ErrorListener import ErrorListener
 from pylasu.model import Position, Point
 from pylasu.validation.validation import Result, Issue, IssueType
 
-from entity_parser.AntlrEntityLexer import AntlrEntityLexer
-from entity_parser.AntlrEntityParser import AntlrEntityParser
-from interpreter.entities_parser.entities_ast import Module
-from interpreter.script_parser.script_parsetree_converter import to_ast
-from script_parser.AntlrScriptLexer import AntlrScriptLexer
-from script_parser.AntlrScriptParser import AntlrScriptParser
+from parsers.script_parser.AntlrScriptLexer import AntlrScriptLexer
+from parsers.script_parser.AntlrScriptParser import AntlrScriptParser
 
 
 class MyListener(ErrorListener):

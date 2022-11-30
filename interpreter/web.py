@@ -5,10 +5,10 @@ import traceback
 
 from flask import Flask, render_template, redirect, request
 
-from interpreter.entities_parser.entities_ast import Module
-from interpreter.entities_parser.entities_pylasu_parser import EntitiesPylasuParser
+from parsers.entities_parser.entities_ast import Module
+from parsers.entities_parser.entities_pylasu_parser import EntitiesPylasuParser
 from interpreter.interpreter import Interpreter
-from interpreter.script_parser.script_pylasu_parser import ScriptPylasuParser
+from parsers.script_parser import ScriptPylasuParser
 
 
 def load_module() -> Module:

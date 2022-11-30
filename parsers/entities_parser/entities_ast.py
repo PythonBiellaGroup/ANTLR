@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 from dataclasses import dataclass, field
-from enum import Enum
+from typing import List
+
 from pylasu.model import Node
 from pylasu.model.naming import ReferenceByName, Named
 
@@ -8,7 +10,7 @@ from pylasu.model.naming import ReferenceByName, Named
 @dataclass
 class Module(Node):
     name: str = field(default=None)
-    entities: list[Entity] = field(default_factory=list)
+    entities: List[Entity] = field(default_factory=list)
 
     def add_entity(self, name) -> Entity:
         e = Entity()
@@ -27,7 +29,7 @@ class Module(Node):
 @dataclass
 class Entity(Node):
     name: str = field(default=None)
-    features: list[Feature] = field(default_factory=list)
+    features: List[Feature] = field(default_factory=list)
 
     def __hash__(self) -> int:
         return self.name.__hash__()

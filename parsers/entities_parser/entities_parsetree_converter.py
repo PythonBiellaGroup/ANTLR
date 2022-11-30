@@ -5,8 +5,8 @@ from pylasu.parsing.parse_tree import ParseTreeOrigin
 from pylasu.support import extension_method
 from pylasu.validation import Issue
 
-from interpreter.entities_parser.entities_ast import Module, Entity, Feature, StringType, IntegerType, EntityRefType
-from entity_parser.AntlrEntityParser import AntlrEntityParser
+from parsers.entities_parser.entities_ast import Module, Entity, Feature, StringType, IntegerType, EntityRefType
+from parsers.entities_parser.AntlrEntityParser import AntlrEntityParser
 
 
 @extension_method(AntlrEntityParser.ModuleContext)

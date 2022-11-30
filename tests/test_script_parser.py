@@ -4,12 +4,12 @@ from pylasu.model import Position, Point
 from pylasu.model.naming import ReferenceByName
 from pylasu.validation.validation import Result, IssueType, IssueSeverity
 
-from interpreter.entities_parser.entities_ast import EntityRefType
-from interpreter.script_parser.script_ast import Script, SetStatement, CreateStatement, PrintStatement, \
+from parsers.entities_parser.entities_ast import EntityRefType
+from parsers.script_parser import Script, SetStatement, CreateStatement, PrintStatement, \
     StringLiteralExpression, \
     IntLiteralExpression, SumExpression, DivisionExpression, GetFeatureValueExpression, ConcatExpression, \
     ReferenceExpression
-from interpreter.script_parser.script_pylasu_parser import ScriptPylasuParser
+from parsers.script_parser import ScriptPylasuParser
 
 
 class ScriptParserTest(unittest.TestCase):

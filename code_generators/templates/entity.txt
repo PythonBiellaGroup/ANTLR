@@ -1,0 +1,4 @@
+@dataclass
+class {{node.name}}:
+{% for feature in node.features %}    {{feature.to_python()}}
+{% endfor %}

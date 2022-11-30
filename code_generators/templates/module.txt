@@ -1,0 +1,4 @@
+from dataclasses import dataclass
+{% for entity in node.entities %}
+{{entity.to_python()}}
+{% endfor %}
